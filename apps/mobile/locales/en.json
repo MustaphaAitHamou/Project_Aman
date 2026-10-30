@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Water Finder",
+    "NSLocationWhenInUseUsageDescription": "Water Finder uses your location only while the app is open, to show water points around you. Your location is never stored or shared."
+  }
+}

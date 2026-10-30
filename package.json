@@ -1,0 +1,29 @@
+{
+  "name": "water-finder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Water Finder — carte collaborative des points d'eau potable.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.12.0",
+    "npm": ">=10"
+  },
+  "packageManager": "npm@10.9.4",
+  "scripts": {
+    "mobile": "npm run start --workspace @water-finder/mobile",
+    "mobile:web": "npm run web --workspace @water-finder/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "npm run format:check && npm run typecheck && npm run lint && npm run test"
+  },
+  "devDependencies": {
+    "prettier": "~3.9.10",
+    "typescript": "~6.0.3"
+  }
+}

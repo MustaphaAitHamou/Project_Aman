@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Formatage, types, lint, tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Formatage
+        run: npm run format:check
+      - name: Types (routes typées incluses)
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Tests
+        run: npm run test
+
+  bundles:
+    name: Bundles web, Android et iOS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: quality
+    env:
+      CI: '1'
+      EXPO_OFFLINE: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Export web
+        run: npm run export:web --workspace @water-finder/mobile
+      - name: Export Android et iOS (Metro + Hermes)
+        working-directory: apps/mobile
+        run: npx expo export --platform android --platform ios --output-dir dist-native
+      - name: Vérifier l'absence des données de démonstration dans les bundles
+        working-directory: apps/mobile
+        run: |
+          if grep -rl "monstration n" dist dist-native; then
+            echo "Des données de démonstration ont été trouvées dans un bundle." >&2
+            exit 1
+          fi
