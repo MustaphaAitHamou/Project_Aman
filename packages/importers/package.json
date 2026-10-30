@@ -1,0 +1,25 @@
+{
+  "name": "@water-finder/importers",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Imports ETL des points d'eau : données publiques officielles et OpenStreetMap.",
+  "type": "module",
+  "scripts": {
+    "etl": "tsx src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@water-finder/core": "*",
+    "papaparse": "^5.7.0",
+    "pg": "^8.23.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/papaparse": "^5.5.2",
+    "@types/pg": "^8.23.1",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3",
+    "vitest": "~5.0.5"
+  }
+}

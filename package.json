@@ -20,7 +20,9 @@
     "test": "npm run test --workspaces --if-present",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run typecheck && npm run lint && npm run test"
+    "check": "npm run format:check && npm run typecheck && npm run lint && npm run test",
+    "db:reset": "bash supabase/local/reset-db.sh",
+    "db:test": "bash supabase/local/run-tests.sh"
   },
   "devDependencies": {
     "prettier": "~3.9.10",

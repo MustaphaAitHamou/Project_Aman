@@ -1,0 +1,25 @@
+# Configuration de la CLI Supabase (`supabase start` en local, nécessite Docker).
+project_id = "water-finder"
+
+[api]
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 2000
+
+[db]
+port = 54322
+major_version = 16
+
+[auth]
+site_url = "waterfinder-dev://"
+additional_redirect_urls = ["waterfinder://", "waterfinder-staging://", "http://localhost:8081", "http://localhost:3000"]
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+
+[storage]
+file_size_limit = "6MiB"

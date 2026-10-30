@@ -1,0 +1,56 @@
+name: Synchronisation des données
+
+# Import planifié des sources vérifiées vers la base (Supabase). Inactif tant que le secret
+# SUPABASE_DB_URL n'est pas configuré dans le dépôt (Settings → Secrets → Actions).
+on:
+  schedule:
+    - cron: '17 3 * * 1' # chaque lundi à 03:17 UTC
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: 'Clés des sources (ou "all")'
+        default: 'all'
+        required: true
+      allow_unverified:
+        description: 'Inclure les sources non vérifiées'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: etl
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - name: Vérifier la configuration
+        id: config
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ]; then
+            echo "Secret SUPABASE_DB_URL absent : synchronisation ignorée."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v5
+        if: steps.config.outputs.enabled == 'true'
+      - uses: actions/setup-node@v5
+        if: steps.config.outputs.enabled == 'true'
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+        if: steps.config.outputs.enabled == 'true'
+      - name: Import
+        if: steps.config.outputs.enabled == 'true'
+        run: >
+          npm run etl --workspace @water-finder/importers --
+          import ${{ inputs.sources || 'all' }}
+          ${{ inputs.allow_unverified && '--allow-unverified' || '' }}

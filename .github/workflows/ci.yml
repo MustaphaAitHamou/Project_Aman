@@ -33,6 +33,35 @@ jobs:
       - name: Tests
         run: npm run test
 
+  database:
+    name: Base de données (migrations + tests pgTAP)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PGHOST: localhost
+      PGPORT: '5432'
+      PGUSER: postgres
+    steps:
+      - uses: actions/checkout@v5
+      - name: Installer PostgreSQL 16, PostGIS et pgTAP
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q postgresql-16 postgresql-16-postgis-3 postgresql-16-pgtap
+          sudo sed -i 's/^\(local\|host\).*/\1 all all trust/' /etc/postgresql/16/main/pg_hba.conf || true
+          echo "host all all 127.0.0.1/32 trust" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
+          sudo systemctl restart postgresql
+      - name: Migrations et tests pgTAP
+        run: bash supabase/local/run-tests.sh
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Chargement ETL réel en base
+        run: |
+          bash supabase/local/reset-db.sh wf_etl
+          TEST_DATABASE_URL=postgresql://postgres@localhost:5432/wf_etl npm run test --workspace @water-finder/importers
+
   bundles:
     name: Bundles web, Android et iOS
     runs-on: ubuntu-latest

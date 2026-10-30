@@ -1,6 +1,9 @@
 import type { WaterPointRepository } from '@water-finder/core';
 
 import { env } from '@/config/env';
+import { getSupabase } from '@/services/supabase/client';
+
+import { createSupabaseRepository } from './supabase-repository';
 
 let repository: WaterPointRepository | null | undefined;
 
@@ -12,13 +15,13 @@ function createRepository(): WaterPointRepository | null {
     const demo = require('./demo/demo-repository') as typeof import('./demo/demo-repository');
     return demo.createDemoRepository();
   }
-  // Phase 2 : dépôt Supabase / PostGIS.
-  return null;
+  const supabase = getSupabase();
+  return supabase ? createSupabaseRepository(supabase) : null;
 }
 
 /**
- * Source des points d'eau. Phase 1 : aucune source réelle n'est branchée (`null`),
- * sauf le mode démonstration explicitement activé en développement.
+ * Source des points d'eau : backend Supabase / PostGIS s'il est configuré, sinon aucune
+ * (l'application l'indique). Le mode démonstration n'existe qu'en développement.
  */
 export function getWaterPointRepository(): WaterPointRepository | null {
   if (repository === undefined) repository = createRepository();

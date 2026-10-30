@@ -14,6 +14,11 @@ export type AppEnv = 'development' | 'staging' | 'production';
 export const DEFAULT_MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty';
 /** Police des étiquettes de groupes : doit exister sur le serveur de glyphes du style. */
 export const DEFAULT_MAP_FONT = 'Noto Sans Bold';
+/**
+ * Service de géocodage de la Géoplateforme (IGN), successeur de l'API Adresse.
+ * Format de réponse GeoJSON à revérifier sur la documentation officielle avant la production.
+ */
+export const DEFAULT_GEOCODING_URL = 'https://data.geopf.fr/geocodage/search';
 
 function readAppEnv(): AppEnv {
   const value: unknown = Constants.expoConfig?.extra?.appEnv;
@@ -30,4 +35,15 @@ export const env = {
   mapFont: process.env.EXPO_PUBLIC_MAP_FONT || DEFAULT_MAP_FONT,
   /** Données fictives de démonstration : jamais en production (double garde avec app.config.ts). */
   demoData: process.env.EXPO_PUBLIC_DEMO_DATA === 'true' && appEnv !== 'production',
+  /** Projet Supabase : URL et clé publique (anon). La sécurité repose sur les règles RLS. */
+  supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL || null,
+  supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || null,
+  /** Géocodage d'adresses (Géoplateforme IGN / Base Adresse Nationale). */
+  geocodingUrl: process.env.EXPO_PUBLIC_GEOCODING_URL || DEFAULT_GEOCODING_URL,
+  /** Publicités : désactivables globalement (ex. tests, captures pour les stores). */
+  adsEnabled: process.env.EXPO_PUBLIC_ADS_ENABLED !== 'false',
 } as const;
+
+export function isSupabaseConfigured(): boolean {
+  return !!env.supabaseUrl && !!env.supabaseAnonKey;
+}

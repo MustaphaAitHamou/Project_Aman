@@ -1,0 +1,94 @@
+{
+  "_note": "Réponses réelles des fonctions SQL (base PostGIS locale, données de test fictives). Régénérer si le schéma change.",
+  "bbox": [
+    {
+      "id": "20000000-0000-0000-0000-000000000001",
+      "name": "Fontaine de test",
+      "kind": "drinking_fountain",
+      "latitude": 48.8566,
+      "longitude": 2.3522,
+      "potability": "certified_potable",
+      "operational_status": "working",
+      "availability": "available",
+      "water_type": "still_and_sparkling",
+      "is_free": true,
+      "wheelchair_accessible": null,
+      "last_verified_at": "2026-10-01T10:00:00+00:00",
+      "primary_source_category": "official",
+      "distance_meters": null
+    }
+  ],
+  "nearby": [
+    {
+      "id": "20000000-0000-0000-0000-000000000001",
+      "name": "Fontaine de test",
+      "kind": "drinking_fountain",
+      "latitude": 48.8566,
+      "longitude": 2.3522,
+      "potability": "certified_potable",
+      "operational_status": "working",
+      "availability": "available",
+      "water_type": "still_and_sparkling",
+      "is_free": true,
+      "wheelchair_accessible": null,
+      "last_verified_at": "2026-10-01T10:00:00+00:00",
+      "primary_source_category": "official",
+      "distance_meters": 73.65461927
+    }
+  ],
+  "detail": {
+    "id": "20000000-0000-0000-0000-000000000001",
+    "city": "Testville",
+    "kind": "drinking_fountain",
+    "name": "Fontaine de test",
+    "photos": [
+      {
+        "id": "63c89089-36c6-4c22-aa36-5e548546ef25",
+        "width": 1200,
+        "height": 900,
+        "created_at": "2026-10-03T00:00:00+00:00",
+        "storage_path": "00000000-0000-0000-0000-000000000000/p1.jpg"
+      }
+    ],
+    "address": "1 rue de Test",
+    "is_free": true,
+    "sources": [
+      {
+        "url": "https://example.invalid/jeu",
+        "license": "etalab-2.0",
+        "category": "official",
+        "source_key": "test-officiel",
+        "external_id": "F-42",
+        "source_name": "Source officielle de test",
+        "retrieved_at": "2026-10-02T00:00:00+00:00"
+      }
+    ],
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "potability": "certified_potable",
+    "updated_at": "2026-10-30T21:01:00.199473+00:00",
+    "water_type": "still_and_sparkling",
+    "availability": "available",
+    "country_code": "FR",
+    "opening_hours": "Mo-Su 08:00-20:00",
+    "recent_reports": [
+      {
+        "type": "fixed",
+        "status": "approved",
+        "created_at": "2026-10-04T00:00:00+00:00"
+      }
+    ],
+    "last_verified_at": "2026-10-01T10:00:00+00:00",
+    "operational_status": "working",
+    "publication_status": "published",
+    "potability_evidence": {
+      "url": "https://example.invalid/controle",
+      "kind": "official_dataset",
+      "observed_at": "2026-06-01",
+      "source_name": "Source officielle de test"
+    },
+    "operational_status_at": null,
+    "wheelchair_accessible": null,
+    "primary_source_category": "official"
+  }
+}
