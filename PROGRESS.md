@@ -13,6 +13,9 @@ _Dernière mise à jour : 30/10/2026 — fin de la phase 1._
 **Aucune donnée réelle de point d'eau n'est encore affichée** : aucune source n'est branchée
 (phases 2-3). L'application l'indique clairement sur la carte.
 
+**Dépôt** : <https://github.com/MustaphaAitHamou/Project_Aman> (public, branche `main`), avec
+intégration continue GitHub Actions.
+
 ---
 
 ## Fonctionnalités terminées (phase 1)
@@ -101,6 +104,7 @@ Aucune : la phase 1 est close. La phase 2 n'est pas commencée (en attente de va
 | Navigateur (Playwright, Chromium, build web) — parcours standard                          | ✅ onboarding → autorisation → carte → 4 onglets → paramètres → thème sombre, sans erreur JavaScript                                                                                                                       |
 | Navigateur — parcours démo (11 vérifications)                                             | ✅ 11/11 : bandeau démo, toucher d'un point → panneau, nom, distance « à 70 m », 3 statuts distincts, fiche, filtre « Certifiée » + puce, retrait de la puce, recherche « lyo », zone vide à Lyon, message de zoom minimal |
 | Icônes                                                                                    | ✅ générées, dimensions et transparence vérifiées (icône iOS sans alpha)                                                                                                                                                   |
+| CI GitHub Actions sur `main` (premier push, commit `0db28dd`)                             | ✅ job qualité 11/11 étapes, job bundles 10/10 étapes ([exécution 41077597795](https://github.com/MustaphaAitHamou/Project_Aman/actions/runs/41077597795))                                                                 |
 
 Contenu des tests automatisés : règles de potabilité, ancienneté, filtres, distances et formats,
 emprises et cache, URL d'itinéraire ; contrastes WCAG (2 thèmes + marqueurs) ; cohérence FR/EN
@@ -151,8 +155,6 @@ OSM) ; à autoriser dans les paramètres réseau de l'environnement.
 
 **Comptes et décisions du porteur de projet :**
 
-- Dépôt GitHub (pour sauvegarder le code et activer la CI) — **le code n'existe actuellement que
-  dans l'environnement de travail**.
 - Compte Expo / EAS (development builds), Apple Developer, Google Play Console.
 - Projet Supabase (phase 2) — ou accord pour développer d'abord sur une instance locale.
 - Compte AdMob (phase 6), compte Vercel (phase 7).
@@ -171,6 +173,14 @@ OSM) ; à autoriser dans les paramètres réseau de l'environnement.
    session via `expo-secure-store`.
 
 ## Reprendre le travail (nouvelle session)
+
+```bash
+git clone https://github.com/MustaphaAitHamou/Project_Aman.git
+```
+
+```bash
+cd Project_Aman
+```
 
 ```bash
 npm install

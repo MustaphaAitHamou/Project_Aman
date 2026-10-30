@@ -1,5 +1,7 @@
 # Water Finder
 
+[![CI](https://github.com/MustaphaAitHamou/Project_Aman/actions/workflows/ci.yml/badge.svg)](https://github.com/MustaphaAitHamou/Project_Aman/actions/workflows/ci.yml)
+
 Application mobile (iOS / Android) gratuite pour **trouver les points d'eau potable à proximité** :
 fontaines, robinets publics, stations de remplissage. Elle s'appuie sur trois sources : données
 publiques officielles, OpenStreetMap et contributions de la communauté. Elle sera financée par la

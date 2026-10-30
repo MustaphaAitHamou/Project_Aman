@@ -17,8 +17,8 @@
 ## 1. Installation
 
 ```bash
-git clone <url-du-depot> water-finder
-cd water-finder
+git clone https://github.com/MustaphaAitHamou/Project_Aman.git
+cd Project_Aman
 npm install
 ```
 
