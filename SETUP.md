@@ -61,7 +61,7 @@ npm run check
 Enchaîne : formatage (Prettier), typage (TypeScript strict, routes typées incluses), lint
 (ESLint), tests (Jest pour l'application, Vitest pour `core`, `importers` et `admin`).
 
-Tests SQL (PostgreSQL 16 + PostGIS + pgTAP installés localement) :
+Tests SQL (PostgreSQL 16 ou 17 + PostGIS + pgTAP installés localement ; la CI utilise 17) :
 
 ```bash
 npm run db:test

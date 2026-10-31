@@ -8,7 +8,7 @@ par le porteur du projet)._
 | Phase                                                                  | État                                                                                                  |
 | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
 | 1 — Socle, navigation, design system, carte, géolocalisation           | ✅ Terminée                                                                                           |
-| 2 — Backend Supabase / PostGIS (schéma, RLS, API SQL)                  | ✅ Développée, testée sur PostgreSQL 16 + PostGIS local (70 tests pgTAP)                              |
+| 2 — Backend Supabase / PostGIS (schéma, RLS, API SQL)                  | ✅ Développée, testée sur PostgreSQL 16 (local) et 17 (CI, comme Supabase) — 70 tests pgTAP           |
 | 3 — Imports ETL (OpenStreetMap, data.gouv.fr, Opendatasoft)            | ✅ Développée ; chargement testé en base ; **jamais exécutée sur les vraies API** (réseau bloqué ici) |
 | 4 — Géocodage, fiche complète, partage, favoris                        | ✅ Développée, testée (tests automatisés)                                                             |
 | 5 — Comptes, contributions, modération côté application, notifications | ✅ Développée, testée (tests automatisés + SQL)                                                       |
@@ -81,18 +81,18 @@ soumission aux stores. Prochaine étape : votre recette manuelle locale.
 
 ## Tests réellement exécutés (31/10/2026)
 
-| Vérification                                                       | Résultat                                                     |
-| ------------------------------------------------------------------ | ------------------------------------------------------------ |
-| `npm run check` (Prettier, TypeScript 5 paquets, ESLint, tests)    | ✅                                                           |
-| Jest `apps/mobile`                                                 | ✅ 15 suites, **133 tests**                                  |
-| Vitest `packages/core`                                             | ✅ **32 tests**                                              |
-| Vitest `packages/importers` avec base PostGIS réelle               | ✅ **19 tests** (dont chargement en base)                    |
-| Vitest `apps/admin`                                                | ✅ 3 tests                                                   |
-| pgTAP (PostgreSQL 16 + PostGIS 3 + privilèges par défaut Supabase) | ✅ **70 tests**                                              |
-| Export web, Android (Hermes)                                       | ✅                                                           |
-| `next build` de l'administration                                   | ✅                                                           |
-| Serveur d'administration : redirection vers /login, en-têtes       | ✅ (sans Supabase joignable)                                 |
-| CI GitHub (qualité, base de données, bundles)                      | ✅ sur `dcbe2dc` ; vérifier l'exécution des derniers commits |
+| Vérification                                                           | Résultat                                                     |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------ |
+| `npm run check` (Prettier, TypeScript 5 paquets, ESLint, tests)        | ✅                                                           |
+| Jest `apps/mobile`                                                     | ✅ 15 suites, **133 tests**                                  |
+| Vitest `packages/core`                                                 | ✅ **32 tests**                                              |
+| Vitest `packages/importers` avec base PostGIS réelle                   | ✅ **19 tests** (dont chargement en base)                    |
+| Vitest `apps/admin`                                                    | ✅ 3 tests                                                   |
+| pgTAP (PostgreSQL 16 local, 17 en CI + privilèges par défaut Supabase) | ✅ **70 tests**                                              |
+| Export web, Android (Hermes)                                           | ✅                                                           |
+| `next build` de l'administration                                       | ✅                                                           |
+| Serveur d'administration : redirection vers /login, en-têtes           | ✅ (sans Supabase joignable)                                 |
+| CI GitHub (qualité, base de données, bundles)                          | ✅ sur `dcbe2dc` ; vérifier l'exécution des derniers commits |
 
 Nouveaux tests (phases 4 à 7) : analyse de la réponse de géocodage et absence d'envoi de
 position ; blocs publicitaires (test hors production, aucun en production non configurée,
@@ -114,6 +114,15 @@ fonctions internes non appelables, coordonnées fournies au modérateur.
 - Parcours connecté de l'administration.
 
 → Tout cela est couvert par la recette de [LOCAL_TESTING.md](LOCAL_TESTING.md).
+
+## Recette locale du porteur du projet (en cours, 31/10/2026, Windows)
+
+| Étape                                                     | Résultat                                                              |
+| --------------------------------------------------------- | --------------------------------------------------------------------- |
+| Fond de carte OpenFreeMap (aperçu web)                    | ✅ s'affiche (première vérification réelle)                           |
+| Import OpenStreetMap réel, Paris, `--dry-run`             | ✅ 1 590 éléments reçus d'Overpass, 1 590 valides, 0 rejeté           |
+| `npx supabase start`                                      | ❌ → corrigé : `major_version = 16` refusé par la CLI, passé à **17** |
+| Import réel en base, application branchée, administration | ⏳ à faire                                                            |
 
 ## Revue de sécurité (phase 8)
 
@@ -172,4 +181,4 @@ cd Project_Aman && npm install && npm run check
 ```
 
 Lire [CLAUDE.md](CLAUDE.md), [ARCHITECTURE.md](ARCHITECTURE.md) puis ce fichier. Tests SQL
-locaux : `npm run db:test` (PostgreSQL 16 + PostGIS + pgTAP, variables `PGHOST`/`PGPORT`/`PGUSER`).
+locaux : `npm run db:test` (PostgreSQL 16/17 + PostGIS + pgTAP, variables `PGHOST`/`PGPORT`/`PGUSER`).

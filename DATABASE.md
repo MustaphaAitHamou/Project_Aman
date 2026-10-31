@@ -1,7 +1,7 @@
 # Base de données (Supabase · PostgreSQL · PostGIS)
 
 > **Statut : implémenté** dans `supabase/migrations/` (7 migrations) et testé par
-> `supabase/tests/database.test.sql` (70 tests pgTAP sur PostgreSQL 16 + PostGIS 3, avec les
+> `supabase/tests/database.test.sql` (70 tests pgTAP sur PostgreSQL 17 en CI + PostGIS 3, avec les
 > privilèges par défaut d'un projet Supabase). La conception ci-dessous reste la référence ; la
 > section « Fonctions exposées » liste l'API réellement disponible.
 
@@ -175,7 +175,7 @@ Toutes les autres fonctions (aides internes, déclencheurs) sont révoquées pou
 npm run db:test
 ```
 
-Nécessite PostgreSQL 16, PostGIS 3 et pgTAP (`PGHOST`, `PGPORT`, `PGUSER`). Le script crée une base
+Nécessite PostgreSQL 16 ou 17 (la CI utilise 17, comme Supabase), PostGIS 3 et pgTAP (`PGHOST`, `PGPORT`, `PGUSER`). Le script crée une base
 jetable, applique `supabase/local/supabase-shim.sql` (rôles, schéma `auth`, privilèges par défaut
 de Supabase) puis les migrations, et exécute les tests. Avec Supabase CLI :
 `npx supabase start` applique les mêmes migrations (voir [LOCAL_TESTING.md](LOCAL_TESTING.md)).

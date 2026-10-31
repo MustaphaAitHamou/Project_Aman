@@ -9,7 +9,7 @@ max_rows = 2000
 
 [db]
 port = 54322
-major_version = 16
+major_version = 17
 
 [auth]
 site_url = "waterfinder-dev://"

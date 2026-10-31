@@ -71,7 +71,7 @@ publication publique automatique.
 
 1. `npm ci`
 2. Formatage (Prettier), typage (routes typées incluses), lint, tests
-3. Base de données : PostgreSQL 16 + PostGIS + pgTAP, migrations et tests SQL, puis chargement
+3. Base de données : PostgreSQL 17 (même version que Supabase) + PostGIS + pgTAP, migrations et tests SQL, puis chargement
    ETL réel en base (tests d'intégration des importeurs)
 4. Export des bundles web, Android et iOS (vérifie que Metro et Hermes compilent l'application)
    et build de l'administration Next.js
