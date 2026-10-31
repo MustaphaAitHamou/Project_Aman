@@ -1,19 +1,25 @@
 import type { LngLat } from '@water-finder/core';
 
+import type { SupportedCountry } from '@/lib/region';
+
+import { WORLD_CITIES } from './cities-world';
+
 export interface City {
   id: string;
   name: string;
   region: string;
+  country: SupportedCountry;
   /** Centre-ville approximatif [longitude, latitude], pour positionner la carte. */
   center: LngLat;
 }
 
+type CityEntry = Omit<City, 'country'>;
+
 /**
- * Grandes villes de France métropolitaine et de Corse, pour la recherche manuelle
- * (sans GPS) en attendant le géocodage d'adresses (Base Adresse Nationale, phase 4).
- * Les coordonnées servent uniquement à cadrer la carte : ce ne sont pas des points d'eau.
+ * Grandes villes de France métropolitaine et de Corse, pour la recherche manuelle (sans GPS ni
+ * réseau). Les coordonnées servent uniquement à cadrer la carte : ce ne sont pas des points d'eau.
  */
-export const FRENCH_CITIES: readonly City[] = [
+const FRANCE: readonly CityEntry[] = [
   { id: 'paris', name: 'Paris', region: 'Île-de-France', center: [2.3522, 48.8566] },
   {
     id: 'marseille',
@@ -91,6 +97,17 @@ export const FRENCH_CITIES: readonly City[] = [
   { id: 'bastia', name: 'Bastia', region: 'Corse', center: [9.4509, 42.6977] },
 ];
 
+export const FRENCH_CITIES: readonly City[] = FRANCE.map((city) => ({ ...city, country: 'FR' }));
+
+/** Toutes les villes, celles du pays de l'appareil en premier. */
+export function allCities(region: string | null): City[] {
+  const cities = [...FRENCH_CITIES, ...WORLD_CITIES];
+  return [
+    ...cities.filter((city) => city.country === region),
+    ...cities.filter((city) => city.country !== region),
+  ];
+}
+
 export const CITY_ZOOM = 13;
 
 /** Minuscules, sans accents, tirets et apostrophes remplacés par des espaces. */
@@ -105,7 +122,11 @@ export function normalizeSearchText(value: string): string {
 }
 
 /** Les villes dont le nom commence par la saisie passent avant celles qui la contiennent. */
-export function searchCities(query: string, cities: readonly City[] = FRENCH_CITIES): City[] {
+export function searchCities(
+  query: string,
+  cities: readonly City[] = FRENCH_CITIES,
+  countryName: (code: SupportedCountry) => string = () => '',
+): City[] {
   const needle = normalizeSearchText(query);
   if (!needle) return [...cities];
   const startsWith: City[] = [];
@@ -113,7 +134,11 @@ export function searchCities(query: string, cities: readonly City[] = FRENCH_CIT
   for (const city of cities) {
     const name = normalizeSearchText(city.name);
     if (name.startsWith(needle)) startsWith.push(city);
-    else if (name.includes(needle) || normalizeSearchText(city.region).includes(needle))
+    else if (
+      name.includes(needle) ||
+      normalizeSearchText(city.region).includes(needle) ||
+      normalizeSearchText(countryName(city.country)).includes(needle)
+    )
       contains.push(city);
   }
   return [...startsWith, ...contains];

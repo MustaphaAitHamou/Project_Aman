@@ -206,6 +206,7 @@ export const en: Translations = {
     addressError: 'Address search is unavailable right now.',
     noAddress: 'No address found.',
     addressAttribution: 'Addresses: IGN Géoplateforme / Base Adresse Nationale',
+    addressAttributionPhoton: 'Addresses: Photon (komoot) · © OpenStreetMap contributors',
   },
   add: {
     title: 'Contribute',
@@ -519,6 +520,16 @@ export const en: Translations = {
   },
   ads: {
     label: 'Ad',
+  },
+  countries: {
+    DZ: 'Algeria',
+    FR: 'France',
+    BE: 'Belgium',
+    CH: 'Switzerland',
+    ES: 'Spain',
+    IT: 'Italy',
+    CA: 'Canada',
+    US: 'United States',
   },
   errors: {
     generic: 'An unexpected error occurred.',

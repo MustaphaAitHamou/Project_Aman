@@ -19,6 +19,11 @@ export const DEFAULT_MAP_FONT = 'Noto Sans Bold';
  * Format de réponse GeoJSON à revérifier sur la documentation officielle avant la production.
  */
 export const DEFAULT_GEOCODING_URL = 'https://data.geopf.fr/geocodage/search';
+/**
+ * Géocodage hors de France : instance publique de Photon (komoot), usage modéré toléré.
+ * Pour la production : instance dédiée ou offre commerciale (voir DATA_SOURCES.md).
+ */
+export const DEFAULT_GEOCODING_INTL_URL = 'https://photon.komoot.io/api';
 
 function readAppEnv(): AppEnv {
   const value: unknown = Constants.expoConfig?.extra?.appEnv;
@@ -40,6 +45,8 @@ export const env = {
   supabaseAnonKey: process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || null,
   /** Géocodage d'adresses (Géoplateforme IGN / Base Adresse Nationale). */
   geocodingUrl: process.env.EXPO_PUBLIC_GEOCODING_URL || DEFAULT_GEOCODING_URL,
+  /** Géocodage international (Photon, données OpenStreetMap). */
+  geocodingIntlUrl: process.env.EXPO_PUBLIC_GEOCODING_INTL_URL || DEFAULT_GEOCODING_INTL_URL,
   /** Publicités : désactivables globalement (ex. tests, captures pour les stores). */
   adsEnabled: process.env.EXPO_PUBLIC_ADS_ENABLED !== 'false',
 } as const;

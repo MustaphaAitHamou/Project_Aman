@@ -4,6 +4,10 @@ import { createDatagouvConnector } from '../src/connectors/datagouv';
 import { createOpendatasoftConnector, OPENDATASOFT_SOURCES } from '../src/connectors/opendatasoft';
 import {
   buildOverpassQuery,
+  createOsmConnector,
+  OSM_COUNTRIES,
+  osmSourceInfo,
+  tileBBox,
   transformOsmElement,
   transformOsmResponse,
   type OsmElement,
@@ -103,11 +107,82 @@ describe('OpenStreetMap', () => {
     expect(result.rejections).toHaveLength(1);
   });
 
-  it('requête Overpass par pays ou par emprise', () => {
-    expect(buildOverpassQuery()).toContain('area["ISO3166-1"="FR"]');
-    const query = buildOverpassQuery([2.2, 48.8, 2.5, 48.9]);
-    expect(query).toContain('(48.8,2.2,48.9,2.5)');
-    expect(query).toContain('nwr["amenity"="drinking_water"]');
+  it('requête Overpass restreinte au pays et à la tuile', () => {
+    const query = buildOverpassQuery('DZ', [2.2, 36.6, 3.3, 36.9]);
+    expect(query).toContain('area["ISO3166-1"="DZ"]');
+    expect(query).toContain('nwr["amenity"="drinking_water"](area.searchArea)(36.6,2.2,36.9,3.3)');
+  });
+
+  it('découpe une emprise en tuiles couvrant tout le territoire', () => {
+    const tiles = tileBBox([-8.7, 18.9, 12.0, 37.2], 4);
+    expect(tiles).toHaveLength(6 * 5);
+    expect(tiles[0]).toEqual([-8.7, 18.9, -4.7, 22.9]);
+    expect(tiles.at(-1)).toEqual([11.3, 34.9, 12, 37.2]);
+  });
+
+  it('pays couverts : clés et codes ISO', () => {
+    expect(OSM_COUNTRIES.map((c) => osmSourceInfo(c).key)).toEqual([
+      'osm-dz',
+      'osm-fr',
+      'osm-be',
+      'osm-ch',
+      'osm-es',
+      'osm-it',
+      'osm-ca',
+      'osm-us',
+    ]);
+  });
+
+  it('connecteur par tuiles : doublons entre tuiles ignorés, tuile en échec journalisée', async () => {
+    const algeria = OSM_COUNTRIES.find((c) => c.code === 'DZ')!;
+    let call = 0;
+    const http: HttpClient = {
+      getJson: async () => undefined as never,
+      getText: async () => '',
+      postForm: async () => {
+        call += 1;
+        if (call === 2) throw new Error('HTTP 504');
+        // Le même chemin est renvoyé par plusieurs tuiles (objet à cheval).
+        return {
+          elements: [
+            osm({ amenity: 'drinking_water' }, { type: 'way', id: 7, lat: 36.75, lon: 3.05 }),
+            osm({ amenity: 'drinking_water' }, { id: 100 + call, lat: 36.7, lon: 3.1 }),
+          ],
+        } as never;
+      },
+    };
+    const result = await createOsmConnector(algeria, { pauseMs: 0 }).run({
+      http,
+      log: () => undefined,
+      // Alger et ses environs : 2 tuiles de 4°.
+      bbox: [0, 34, 8, 37],
+    });
+    expect(call).toBe(2 * 1);
+    expect(result.records.map((r) => r.externalId)).toEqual(['way/7', 'node/101']);
+    expect(result.rejections).toEqual([
+      { externalId: 'tuile:4,34,8,37', reason: expect.stringContaining('HTTP 504') },
+    ]);
+  });
+
+  it('connecteur : échec si toutes les tuiles échouent ou si l’emprise est hors du pays', async () => {
+    const belgium = OSM_COUNTRIES.find((c) => c.code === 'BE')!;
+    const failing: HttpClient = {
+      getJson: async () => undefined as never,
+      getText: async () => '',
+      postForm: async () => {
+        throw new Error('HTTP 429');
+      },
+    };
+    await expect(
+      createOsmConnector(belgium, { pauseMs: 0 }).run({ http: failing, log: () => undefined }),
+    ).rejects.toThrow('Toutes les tuiles');
+    await expect(
+      createOsmConnector(belgium, { pauseMs: 0 }).run({
+        http: failing,
+        log: () => undefined,
+        bbox: [100, 10, 101, 11],
+      }),
+    ).rejects.toThrow('ne recoupe pas');
   });
 });
 

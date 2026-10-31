@@ -1,8 +1,3 @@
-import type { LngLat } from '@water-finder/core';
-
-/** Vue initiale sans position : la France métropolitaine. */
-export const FRANCE_CAMERA = { center: [2.45, 46.6] as LngLat, zoom: 4.8 };
-
 export const USER_ZOOM = 15;
 export const MAP_MIN_ZOOM = 2;
 export const MAP_MAX_ZOOM = 19;

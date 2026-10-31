@@ -209,6 +209,7 @@ export const fr = {
     addressError: 'Recherche d’adresses indisponible pour le moment.',
     noAddress: 'Aucune adresse trouvée.',
     addressAttribution: 'Adresses : Géoplateforme IGN / Base Adresse Nationale',
+    addressAttributionPhoton: 'Adresses : Photon (komoot) · © les contributeurs d’OpenStreetMap',
   },
   add: {
     title: 'Contribuer',
@@ -528,6 +529,16 @@ export const fr = {
   },
   ads: {
     label: 'Publicité',
+  },
+  countries: {
+    DZ: 'Algérie',
+    FR: 'France',
+    BE: 'Belgique',
+    CH: 'Suisse',
+    ES: 'Espagne',
+    IT: 'Italie',
+    CA: 'Canada',
+    US: 'États-Unis',
   },
   errors: {
     generic: 'Une erreur inattendue est survenue.',

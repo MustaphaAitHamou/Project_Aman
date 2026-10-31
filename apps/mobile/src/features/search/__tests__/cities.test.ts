@@ -1,4 +1,4 @@
-import { FRENCH_CITIES, normalizeSearchText, searchCities } from '../cities';
+import { allCities, FRENCH_CITIES, normalizeSearchText, searchCities } from '../cities';
 
 describe('recherche de villes', () => {
   it('normalise accents, tirets et apostrophes', () => {
@@ -39,5 +39,26 @@ describe('recherche de villes', () => {
       expect(lat).toBeGreaterThan(41.3);
       expect(lat).toBeLessThan(51.2);
     }
+  });
+});
+
+describe('villes des autres pays', () => {
+  it('le pays de l’appareil passe en premier, sans doublon d’identifiant', () => {
+    const cities = allCities('DZ');
+    expect(cities[0]?.country).toBe('DZ');
+    expect(new Set(cities.map((c) => c.id)).size).toBe(cities.length);
+    expect(allCities(null)[0]?.country).toBe('FR');
+    for (const { center } of cities) {
+      expect(Math.abs(center[0])).toBeLessThanOrEqual(180);
+      expect(Math.abs(center[1])).toBeLessThanOrEqual(90);
+    }
+  });
+
+  it('recherche sans accents dans les noms et par nom de pays', () => {
+    const cities = allCities('DZ');
+    expect(searchCities('bejaia', cities).map((c) => c.id)).toEqual(['bejaia']);
+    const names: Record<string, string> = { DZ: 'Algérie', BE: 'Belgique' };
+    const algerian = searchCities('algerie', cities, (code) => names[code] ?? '');
+    expect(algerian.length).toBe(cities.filter((c) => c.country === 'DZ').length);
   });
 });

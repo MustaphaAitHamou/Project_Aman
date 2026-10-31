@@ -3,8 +3,11 @@ import { buildShareMessage } from '@/features/water-points/share';
 import { adUnitId, GOOGLE_TEST_UNITS, INTERSTITIALS_ENABLED } from '@/services/ads/ad-units';
 import { toAuthErrorCode, isValidEmail } from '@/services/auth/auth-service';
 import { photoStoragePath } from '@/services/community/api';
+import { defaultCamera } from '@/lib/region';
 import {
   parseGeocodingResponse,
+  parsePhotonResponse,
+  providerFor,
   searchAddresses,
   zoomForResult,
 } from '@/services/geocoding/geocoding';
@@ -56,6 +59,58 @@ describe('géocodage', () => {
     await expect(searchAddresses('rue de rivoli', { fetchImpl })).rejects.toThrow(
       'geocoding_http_503',
     );
+  });
+});
+
+describe('géocodage international', () => {
+  it('choisit le service selon la zone affichée, puis le pays de l’appareil', () => {
+    expect(providerFor([2.35, 48.85], 'DZ')).toBe('ign');
+    expect(providerFor([3.06, 36.75], 'FR')).toBe('photon');
+    expect(providerFor(null, 'DZ')).toBe('photon');
+    expect(providerFor(null, null)).toBe('ign');
+  });
+
+  it('reconstitue le libellé d’une réponse Photon', () => {
+    const results = parsePhotonResponse({
+      features: [
+        {
+          geometry: { coordinates: [3.0588, 36.7538] },
+          properties: {
+            osm_type: 'N',
+            osm_id: 42,
+            type: 'house',
+            housenumber: '12',
+            street: 'Rue Didouche Mourad',
+            postcode: '16000',
+            city: 'Alger',
+            country: 'Algérie',
+          },
+        },
+        { geometry: { coordinates: [1, 2] }, properties: {} },
+      ],
+    });
+    expect(results).toEqual([
+      {
+        id: 'N42',
+        label: '12 Rue Didouche Mourad',
+        context: '16000 Alger, Algérie',
+        type: 'housenumber',
+        center: [3.0588, 36.7538],
+      },
+    ]);
+  });
+
+  it('interroge Photon avec la langue, sans position', async () => {
+    const fetchImpl = jest.fn(async () => Response.json({ features: [] }));
+    await searchAddresses('rue didouche', { fetchImpl, provider: 'photon', language: 'fr' });
+    const url = new URL(String((fetchImpl.mock.calls[0] as unknown[])[0]));
+    expect(url.host).toBe('photon.komoot.io');
+    expect([...url.searchParams.keys()].sort()).toEqual(['lang', 'limit', 'q']);
+  });
+
+  it('carte initiale selon le pays de l’appareil', () => {
+    expect(defaultCamera('DZ').center).toEqual([3.0, 34.5]);
+    expect(defaultCamera('JP')).toEqual(defaultCamera('FR'));
   });
 });
 

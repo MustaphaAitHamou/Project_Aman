@@ -18,7 +18,9 @@ import { USER_ZOOM } from '@/features/map/map-config';
 import { useMapCameraStore } from '@/stores/map-camera';
 import { useAppTheme } from '@/theme';
 
-import { CITY_ZOOM, searchCities, type City } from './cities';
+import { deviceRegion } from '@/lib/region';
+
+import { allCities, CITY_ZOOM, searchCities, type City } from './cities';
 
 export function SearchScreen() {
   const { t } = useTranslation();
@@ -27,7 +29,8 @@ export function SearchScreen() {
   const router = useRouter();
   const requestCamera = useMapCameraStore((state) => state.requestCamera);
   const [query, setQuery] = useState('');
-  const results = searchCities(query);
+  const [cities] = useState(() => allCities(deviceRegion()));
+  const results = searchCities(query, cities, (code) => t(`countries.${code}`));
   const addresses = useAddressSearch(query);
   const showAddresses = query.trim().length >= MIN_GEOCODING_QUERY;
 
@@ -124,7 +127,9 @@ export function SearchScreen() {
                   ))
                 )}
                 <AppText variant="caption" tone="muted">
-                  {t('search.addressAttribution')}
+                  {addresses.provider === 'photon'
+                    ? t('search.addressAttributionPhoton')
+                    : t('search.addressAttribution')}
                 </AppText>
               </View>
             ) : (
@@ -150,7 +155,11 @@ export function SearchScreen() {
             testID={`city-${item.id}`}
             icon="city-variant-outline"
             title={item.name}
-            subtitle={item.region}
+            subtitle={
+              item.region === item.name
+                ? t(`countries.${item.country}`)
+                : `${item.region} · ${t(`countries.${item.country}`)}`
+            }
             onPress={() => goToCity(item)}
           />
         )}

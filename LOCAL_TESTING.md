@@ -104,6 +104,21 @@ Import réel d'OpenStreetMap sur Paris :
 SUPABASE_DB_URL=postgresql://postgres:postgres@127.0.0.1:44322/postgres npm run etl -- import osm-fr --bbox=2.22,48.81,2.47,48.91
 ```
 
+Autres pays (l'Algérie entière prend quelques minutes ; découpage automatique en tuiles) :
+
+```bash
+npm run etl -- import osm-dz
+```
+
+Une région seulement, par exemple Alger et ses environs :
+
+```bash
+npm run etl -- import osm-dz "--bbox=2.5,36.4,3.6,36.9"
+```
+
+Clés disponibles : `osm-dz`, `osm-fr`, `osm-be`, `osm-ch`, `osm-es`, `osm-it`, `osm-ca`, `osm-us`
+(liste complète : `npm run etl -- list`). Pour la France entière : `npm run etl -- import osm-fr`.
+
 Jeu officiel de la Ville de Paris (source pas encore vérifiée : l'option `--allow-unverified` est
 volontairement exigée ; vérifiez d'abord la licence et les champs sur la fiche du jeu) :
 

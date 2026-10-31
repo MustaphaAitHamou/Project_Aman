@@ -20,6 +20,22 @@ jest.mock('expo-haptics', () => ({
   ImpactFeedbackStyle: { Light: 'light', Medium: 'medium', Heavy: 'heavy' },
 }));
 
+// Appareil réglé en France (le simulateur par défaut est américain : pieds, carte des États-Unis).
+jest.mock('expo-localization', () => {
+  const locale = {
+    languageTag: 'fr-FR',
+    languageCode: 'fr',
+    regionCode: 'FR',
+    measurementSystem: 'metric',
+    textDirection: 'ltr',
+  };
+  return {
+    ...jest.requireActual('expo-localization'),
+    getLocales: () => [locale],
+    useLocales: () => [locale],
+  };
+});
+
 // Initialise i18next (langue forcée en français pour des assertions stables).
 import i18n from '@/i18n';
 

@@ -13,6 +13,7 @@ import {
   type Viewport,
 } from '@/services/water-points/useWaterPointsInViewport';
 import { useLocationStore } from '@/stores/location';
+import { defaultCamera } from '@/lib/region';
 import { useMapCameraStore } from '@/stores/map-camera';
 import { usePreferencesStore } from '@/stores/preferences';
 import { useAppTheme } from '@/theme';
@@ -20,7 +21,7 @@ import { useAppTheme } from '@/theme';
 import { getActiveFilters } from './active-filters';
 import { ActiveFiltersBar } from './ActiveFiltersBar';
 import { toPointFeatureCollection } from './geojson';
-import { FRANCE_CAMERA, PREVIEW_PANEL_PADDING, USER_ZOOM } from './map-config';
+import { PREVIEW_PANEL_PADDING, USER_ZOOM } from './map-config';
 import { selectMapNotice, type NoticeAction } from './map-notice';
 import { MapNoticeBanner } from './MapNoticeBanner';
 import { MapSearchBar } from './MapSearchBar';
@@ -57,7 +58,7 @@ export function MapScreen() {
   const [mapKey, setMapKey] = useState(0);
   const [panelHeight, setPanelHeight] = useState(0);
   const [initialCamera] = useState(() =>
-    position ? { center: toLngLat(position), zoom: USER_ZOOM } : FRANCE_CAMERA,
+    position ? { center: toLngLat(position), zoom: USER_ZOOM } : defaultCamera(),
   );
 
   /** L'utilisateur a déplacé la carte : on ne la recentre plus automatiquement. */

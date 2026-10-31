@@ -4,6 +4,8 @@ import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
+import { deviceUsesImperial } from '@/lib/region';
+
 export type ThemePreference = 'system' | 'light' | 'dark';
 export type LanguagePreference = 'system' | 'fr' | 'en';
 
@@ -31,7 +33,8 @@ export const DEFAULT_PREFERENCES: PersistedPreferences = {
   hasCompletedOnboarding: false,
   themePreference: 'system',
   languagePreference: 'system',
-  distanceUnit: 'metric',
+  // Valeur initiale selon le système de mesure de l'appareil ; modifiable dans les paramètres.
+  distanceUnit: deviceUsesImperial() ? 'imperial' : 'metric',
   filters: { ...DEFAULT_FILTERS },
 };
 

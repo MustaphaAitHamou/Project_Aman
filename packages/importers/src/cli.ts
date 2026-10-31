@@ -25,7 +25,8 @@ function option(args: string[], name: string): string | undefined {
 
 async function main() {
   const [command, ...args] = process.argv.slice(2);
-  const http = createHttpClient();
+  // Délai supérieur au délai serveur des requêtes Overpass (180 s par tuile).
+  const http = createHttpClient({ timeoutMs: 240_000 });
   const connectors = createConnectors();
 
   if (!command || command === 'help') {

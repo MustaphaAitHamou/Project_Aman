@@ -75,8 +75,11 @@ officielles ou communautaires dans une même table, cette base pourrait devoir �
 ODbL. Option envisagée : garder les données OSM séparables (« base de données collective ») et
 tracer la provenance champ par champ (`water_point_sources`). Avis juridique recommandé.
 
-**Accès aux données** : API Overpass (`OVERPASS_URL`, par défaut `overpass-api.de`), requête
-par emprise (`--bbox`) ou France entière. Pour un import national régulier, l'instance publique
+**Accès aux données** : API Overpass (`OVERPASS_URL`, par défaut `overpass-api.de`). Chaque pays
+est découpé en tuiles (2° à 5° selon la densité) interrogées l'une après l'autre avec une pause
+d'une seconde, filtrées par la frontière du pays (code ISO) ; un objet à cheval sur deux tuiles
+n'est importé qu'une fois ; une tuile en échec rend l'import « partiel » sans bloquer les autres.
+`--bbox` limite l'import à une zone. Pour un import national régulier, l'instance publique
 impose des limites : prévoir une instance dédiée ou des extraits Geofabrik filtrés.
 
 **Tags utilisés** (implémentés dans `packages/importers/src/connectors/osm.ts`, testés) :
@@ -94,6 +97,22 @@ impose des limites : prévoir une instance dédiée ou des extraits Geofabrik fi
 | `fee=*`, `wheelchair=*`, `opening_hours=*`, `seasonal=*` | Gratuité, accessibilité, horaires, saisonnalité | —                                                         |
 
 Aucun tag OSM ne produit `certified_potable` : seule une source officielle datée le peut.
+
+### Pays couverts
+
+| Pays (clé)            | Tuiles | Données officielles complémentaires                                 |
+| --------------------- | ------ | ------------------------------------------------------------------- |
+| Algérie (`osm-dz`)    | 4°     | Aucun jeu ouvert connu de points d'eau : OpenStreetMap + communauté |
+| France (`osm-fr`)     | 2°     | data.gouv.fr, Ville de Paris (connecteurs existants)                |
+| Belgique (`osm-be`)   | 2°     | À rechercher (portails régionaux, ex. Bruxelles)                    |
+| Suisse (`osm-ch`)     | 2°     | À rechercher (villes : Genève, Zurich…)                             |
+| Espagne (`osm-es`)    | 2°     | À rechercher (datos.gob.es, Madrid, Barcelone)                      |
+| Italie (`osm-it`)     | 2°     | À rechercher (dati.gov.it, « nasoni » de Rome…)                     |
+| Canada (`osm-ca`)     | 5°     | À rechercher (Toronto, Montréal, Vancouver publient des fontaines)  |
+| États-Unis (`osm-us`) | 3°     | À rechercher (NYC Open Data, San Francisco…)                        |
+
+Les imports des grands pays (Canada, États-Unis) comptent plusieurs centaines de tuiles et
+durent longtemps : commencer par une région (`--bbox`).
 
 ## Données publiques officielles (phase 3)
 

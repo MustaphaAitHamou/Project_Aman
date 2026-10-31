@@ -125,6 +125,20 @@ fonctions internes non appelables, coordonnées fournies au modérateur.
 | `npx supabase start` (2ᵉ essai)                           | ❌ port 54322 déjà pris sous Windows → ports du projet passés en 443xx |
 | Import réel en base, application branchée, administration | ⏳ à faire                                                             |
 
+## International (31/10/2026, demande du porteur du projet)
+
+Pays ajoutés : **Algérie (prioritaire)**, Belgique, Suisse, Espagne, Italie, Canada, États-Unis.
+
+- Imports OpenStreetMap par pays (`osm-dz`, `osm-be`…), découpés en tuiles filtrées par la
+  frontière ISO ; tuile en échec journalisée sans bloquer l'import (testé).
+- Application : 70 grandes villes ajoutées (20 en Algérie), pays de l'appareil en tête de liste ;
+  recherche par nom de pays ; carte initiale et unités (pieds/miles) selon les réglages de
+  l'appareil ; recherche d'adresses hors de France par Photon (OpenStreetMap), la Géoplateforme
+  IGN restant utilisée en France.
+- Non fait, à décider : interface en **arabe** (droite à gauche) pour l'Algérie, en espagnol et
+  en italien ; données officielles des autres pays (aucun connecteur encore) ; mentions légales
+  propres à chaque pays (ex. loi algérienne 18-07 sur les données personnelles).
+
 ## Revue de sécurité (phase 8)
 
 - ✅ Corrigé : sur Supabase, `authenticated` gardait l'exécution des fonctions internes
