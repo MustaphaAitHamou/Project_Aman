@@ -150,6 +150,17 @@ fonctions internes non appelables, coordonnées fournies au modérateur.
    avis juridique ODbL, politique de confidentialité publiée, adresse de contact sécurité.
 4. **Secrets CI** : `SUPABASE_DB_URL` dans GitHub pour activer les imports hebdomadaires.
 
+## Prochaine étape (convenue avec le porteur du projet)
+
+1. Le porteur du projet fait la recette locale ([LOCAL_TESTING.md](LOCAL_TESTING.md)) et
+   transmet les problèmes (messages d'erreur, résultats des imports `npm run etl`, captures).
+2. Dès réception, sans nouvelle validation : corriger tous les problèmes remontés, puis
+   développer les améliorations déjà approuvées :
+   - notifications push (décisions de modération) ;
+   - repère déplaçable sur la carte pour placer un nouveau point ;
+   - panneau d'aperçu glissable au doigt.
+3. Ensuite seulement : préproduction (Vercel, Supabase en ligne), sur accord explicite.
+
 ## Reprendre le travail (nouvelle session)
 
 ```bash
