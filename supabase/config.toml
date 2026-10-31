@@ -1,15 +1,30 @@
 # Configuration de la CLI Supabase (`supabase start` en local, nécessite Docker).
 project_id = "water-finder"
 
+# Ports en 443xx : hors de la plage dynamique de Windows (49152-65535), souvent réservée par
+# Hyper-V / WSL, ce qui bloquait les ports Supabase par défaut (5432x).
 [api]
-port = 54321
+port = 44321
 schemas = ["public"]
 extra_search_path = ["public", "extensions"]
 max_rows = 2000
 
 [db]
-port = 54322
+port = 44322
+shadow_port = 44320
 major_version = 17
+
+[db.pooler]
+port = 44329
+
+[studio]
+port = 44323
+
+[inbucket]
+port = 44324
+
+[analytics]
+port = 44327
 
 [auth]
 site_url = "waterfinder-dev://"

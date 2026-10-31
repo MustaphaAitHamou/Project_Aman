@@ -117,12 +117,13 @@ fonctions internes non appelables, coordonnées fournies au modérateur.
 
 ## Recette locale du porteur du projet (en cours, 31/10/2026, Windows)
 
-| Étape                                                     | Résultat                                                              |
-| --------------------------------------------------------- | --------------------------------------------------------------------- |
-| Fond de carte OpenFreeMap (aperçu web)                    | ✅ s'affiche (première vérification réelle)                           |
-| Import OpenStreetMap réel, Paris, `--dry-run`             | ✅ 1 590 éléments reçus d'Overpass, 1 590 valides, 0 rejeté           |
-| `npx supabase start`                                      | ❌ → corrigé : `major_version = 16` refusé par la CLI, passé à **17** |
-| Import réel en base, application branchée, administration | ⏳ à faire                                                            |
+| Étape                                                     | Résultat                                                               |
+| --------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Fond de carte OpenFreeMap (aperçu web)                    | ✅ s'affiche (première vérification réelle)                            |
+| Import OpenStreetMap réel, Paris, `--dry-run`             | ✅ 1 590 éléments reçus d'Overpass, 1 590 valides, 0 rejeté            |
+| `npx supabase start`                                      | ❌ → corrigé : `major_version = 16` refusé par la CLI, passé à **17**  |
+| `npx supabase start` (2ᵉ essai)                           | ❌ port 54322 déjà pris sous Windows → ports du projet passés en 443xx |
+| Import réel en base, application branchée, administration | ⏳ à faire                                                             |
 
 ## Revue de sécurité (phase 8)
 

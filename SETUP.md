@@ -33,7 +33,7 @@ les comptes (message explicite). Pour un backend local complet (Supabase via Doc
 imports de vraies données, suivre [LOCAL_TESTING.md](LOCAL_TESTING.md). Variables minimales :
 
 ```bash
-EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:44321
 EXPO_PUBLIC_SUPABASE_ANON_KEY=<anon key de « npx supabase status »>
 ```
 

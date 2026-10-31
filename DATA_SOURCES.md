@@ -30,7 +30,7 @@ npm run etl -- discover fontaines
 ```
 
 ```bash
-SUPABASE_DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres npm run etl -- import osm-fr --bbox=2.22,48.81,2.47,48.91 --dry-run
+SUPABASE_DB_URL=postgresql://postgres:postgres@127.0.0.1:44322/postgres npm run etl -- import osm-fr --bbox=2.22,48.81,2.47,48.91 --dry-run
 ```
 
 Règles appliquées par tous les connecteurs :
