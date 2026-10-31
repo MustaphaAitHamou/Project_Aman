@@ -47,9 +47,11 @@ jobs:
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q postgresql-16 postgresql-16-postgis-3 postgresql-16-pgtap
-          sudo sed -i 's/^\(local\|host\).*/\1 all all trust/' /etc/postgresql/16/main/pg_hba.conf || true
-          echo "host all all 127.0.0.1/32 trust" | sudo tee -a /etc/postgresql/16/main/pg_hba.conf
-          sudo systemctl restart postgresql
+          # Base jetable de CI : authentification « trust » (seule la méthode est remplacée).
+          sudo sed -i -E 's/(peer|md5|scram-sha-256)[[:space:]]*$/trust/' /etc/postgresql/16/main/pg_hba.conf
+          sudo systemctl restart postgresql@16-main
+          pg_lsclusters
+          for i in $(seq 1 30); do pg_isready -h localhost -p 5432 && break; sleep 1; done
       - name: Migrations et tests pgTAP
         run: bash supabase/local/run-tests.sh
       - uses: actions/setup-node@v5
