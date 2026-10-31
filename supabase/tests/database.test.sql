@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(59);
+select plan(66);
 
 -- ── Données de test (fictives, dans une transaction annulée à la fin) ───────
 insert into auth.users (id, email) values
@@ -146,9 +146,30 @@ select is((select count(*)::int from water_points where name = 'Robinet Alice'),
   'Bob ne voit pas le point en attente d''Alice');
 reset role;
 
+-- ── Administration : lecture réservée aux modérateurs ───────────────────────
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"00000000-0000-0000-0000-00000000000b","role":"authenticated"}';
+select throws_ok($$select moderation_queue()$$, '42501', null,
+  'un utilisateur ordinaire n''accède pas à la file de modération');
+select throws_ok($$select * from admin_search_points()$$, '42501', null,
+  'un utilisateur ordinaire n''accède pas à la recherche d''administration');
+reset role;
+set local role anon;
+set local request.jwt.claims = '{"role":"anon"}';
+select throws_ok($$select moderation_queue()$$, '42501', null, 'un visiteur n''accède pas à la file');
+reset role;
+
 -- ── Modération ──────────────────────────────────────────────────────────────
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"00000000-0000-0000-0000-00000000000c","role":"authenticated"}';
+
+select is(jsonb_array_length(moderation_queue() -> 'points'), 1,
+  'file de modération : la proposition d''Alice est en attente');
+select ok((moderation_queue() -> 'points' -> 0 ->> 'latitude') is not null,
+  'file de modération : coordonnées fournies au modérateur');
+select is(jsonb_array_length(moderation_queue() -> 'revisions'), 1, 'file : modification en attente');
+select ok((select count(*) from admin_search_points('Robinet Alice')) = 1,
+  'recherche d''administration : les points en attente sont trouvés');
 
 select lives_ok($$select moderate_water_point((select id from t_ids where name = 'alice_point'), 'approve')$$,
   'le modérateur publie la contribution');

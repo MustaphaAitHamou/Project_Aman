@@ -61,3 +61,9 @@ supabase/.temp
 # Worker maplibre-gl copié depuis node_modules (scripts/copy-maplibre-worker.mjs)
 apps/mobile/public/maplibre-gl-worker.mjs
 apps/mobile/dist-native/
+
+# Next.js (admin)
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo

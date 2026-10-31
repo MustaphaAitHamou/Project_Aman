@@ -10,3 +10,5 @@ package-lock.json
 apps/mobile/public/maplibre-gl-worker.mjs
 apps/mobile/expo-env.d.ts
 dist-native
+.next
+next-env.d.ts

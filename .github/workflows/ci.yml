@@ -91,3 +91,9 @@ jobs:
             echo "Des données de démonstration ont été trouvées dans un bundle." >&2
             exit 1
           fi
+      - name: Build de l'administration (Next.js)
+        run: npm run build --workspace @water-finder/admin
+        env:
+          NEXT_TELEMETRY_DISABLED: '1'
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder

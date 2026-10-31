@@ -15,6 +15,7 @@
   "scripts": {
     "mobile": "npm run start --workspace @water-finder/mobile",
     "mobile:web": "npm run web --workspace @water-finder/mobile",
+    "admin": "npm run dev --workspace @water-finder/admin",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
@@ -22,7 +23,8 @@
     "format:check": "prettier --check .",
     "check": "npm run format:check && npm run typecheck && npm run lint && npm run test",
     "db:reset": "bash supabase/local/reset-db.sh",
-    "db:test": "bash supabase/local/run-tests.sh"
+    "db:test": "bash supabase/local/run-tests.sh",
+    "etl": "npm run etl --workspace @water-finder/importers --"
   },
   "devDependencies": {
     "prettier": "~3.9.10",
