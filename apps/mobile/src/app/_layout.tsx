@@ -10,6 +10,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { EmptyState } from '@/components/ui';
 // L'import initialise aussi i18next (effet de bord du module).
 import { useLanguageSync } from '@/i18n';
+import { initializeAds } from '@/services/ads/consent';
+import { useAuthListener } from '@/services/auth/session';
 import { usePreferencesHydrated, usePreferencesStore } from '@/stores/preferences';
 import { AppThemeProvider, useAppTheme } from '@/theme';
 
@@ -48,10 +50,17 @@ function RootNavigator() {
   const hydrated = usePreferencesHydrated();
   const hasCompletedOnboarding = usePreferencesStore((state) => state.hasCompletedOnboarding);
   useLanguageSync();
+  useAuthListener();
 
   useEffect(() => {
     if (hydrated) SplashScreen.hideAsync().catch(() => undefined);
   }, [hydrated]);
+
+  // Consentement publicitaire demandé après la présentation, jamais au premier écran,
+  // et en tâche de fond : la carte reste utilisable pendant ce temps.
+  useEffect(() => {
+    if (hydrated && hasCompletedOnboarding) void initializeAds();
+  }, [hydrated, hasCompletedOnboarding]);
 
   if (!hydrated) return null;
 
@@ -86,6 +95,10 @@ function RootNavigator() {
         <Stack.Screen name="sign-up" options={{ title: t('auth.signUpTitle') }} />
         <Stack.Screen name="favorites" options={{ title: t('favorites.title') }} />
         <Stack.Screen name="contributions" options={{ title: t('contributions.title') }} />
+        <Stack.Screen name="new-point" options={{ title: t('add.addPoint') }} />
+        <Stack.Screen name="report/[id]" options={{ title: t('report.title') }} />
+        <Stack.Screen name="edit-point/[id]" options={{ title: t('add.suggestEdit') }} />
+        <Stack.Screen name="add-photo/[id]" options={{ title: t('add.addPhoto') }} />
       </Stack.Protected>
       <Stack.Screen name="+not-found" options={{ title: t('notFound.title') }} />
     </Stack>

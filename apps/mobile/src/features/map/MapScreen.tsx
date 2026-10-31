@@ -151,6 +151,7 @@ export function MapScreen() {
   const handleViewportChange = (next: MapViewport) => {
     if (next.userInteraction) userMovedMapRef.current = true;
     setViewport({ bounds: next.bounds, zoom: next.zoom });
+    useMapCameraStore.getState().setLastView({ center: next.center, zoom: next.zoom });
   };
 
   const handlePointPress = (id: string) => {

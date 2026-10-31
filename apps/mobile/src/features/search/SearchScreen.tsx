@@ -5,6 +5,14 @@ import { FlatList, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AppText, Banner, EmptyState, ListItem } from '@/components/ui';
+import { AdBanner } from '@/features/ads/AdBanner';
+import { NativeAdCard } from '@/features/ads/NativeAdCard';
+import {
+  MIN_GEOCODING_QUERY,
+  zoomForResult,
+  type GeocodingResult,
+} from '@/services/geocoding/geocoding';
+import { useAddressSearch } from '@/services/geocoding/useAddressSearch';
 import { SearchField } from '@/components/ui/SearchField';
 import { USER_ZOOM } from '@/features/map/map-config';
 import { useMapCameraStore } from '@/stores/map-camera';
@@ -20,6 +28,13 @@ export function SearchScreen() {
   const requestCamera = useMapCameraStore((state) => state.requestCamera);
   const [query, setQuery] = useState('');
   const results = searchCities(query);
+  const addresses = useAddressSearch(query);
+  const showAddresses = query.trim().length >= MIN_GEOCODING_QUERY;
+
+  const goToAddress = (result: GeocodingResult) => {
+    requestCamera({ center: result.center, zoom: zoomForResult(result) });
+    router.navigate('/');
+  };
 
   const goToCity = (city: City) => {
     requestCamera({ center: city.center, zoom: CITY_ZOOM });
@@ -77,12 +92,49 @@ export function SearchScreen() {
               subtitle={t('search.nearMeBody')}
               onPress={goNearMe}
             />
-            <Banner
-              tone="info"
-              icon="map-search-outline"
-              message={t('search.addressSoonBody')}
-              live={false}
-            />
+            {showAddresses ? (
+              <View style={{ gap: theme.space.xs }} testID="address-results">
+                <AppText
+                  variant="footnote"
+                  tone="secondary"
+                  accessibilityRole="header"
+                  style={styles.sectionTitle}
+                >
+                  {t('search.addressesTitle')}
+                </AppText>
+                {addresses.isError ? (
+                  <Banner tone="warning" icon="wifi-off" message={t('search.addressError')} />
+                ) : addresses.isPending ? (
+                  <AppText variant="subhead" tone="secondary">
+                    {t('common.loading')}
+                  </AppText>
+                ) : addresses.data.length === 0 ? (
+                  <AppText variant="subhead" tone="secondary">
+                    {t('search.noAddress')}
+                  </AppText>
+                ) : (
+                  addresses.data.map((result) => (
+                    <ListItem
+                      key={result.id}
+                      icon="map-marker-outline"
+                      title={result.label}
+                      subtitle={result.context ?? undefined}
+                      onPress={() => goToAddress(result)}
+                    />
+                  ))
+                )}
+                <AppText variant="caption" tone="muted">
+                  {t('search.addressAttribution')}
+                </AppText>
+              </View>
+            ) : (
+              <Banner
+                tone="info"
+                icon="map-search-outline"
+                message={t('search.addressHint')}
+                live={false}
+              />
+            )}
             <AppText
               variant="footnote"
               tone="secondary"
@@ -102,12 +154,20 @@ export function SearchScreen() {
             onPress={() => goToCity(item)}
           />
         )}
+        ListFooterComponent={
+          <View style={{ gap: theme.space.lg, marginTop: theme.space.xl }}>
+            <NativeAdCard testID="search-native-ad" />
+            <AdBanner testID="search-ad" />
+          </View>
+        }
         ListEmptyComponent={
-          <EmptyState
-            icon="map-search-outline"
-            tone="neutral"
-            title={t('search.noResults', { query })}
-          />
+          showAddresses ? undefined : (
+            <EmptyState
+              icon="map-search-outline"
+              tone="neutral"
+              title={t('search.noResults', { query })}
+            />
+          )
         }
       />
     </View>

@@ -46,6 +46,22 @@ const bundleIdentifier = `${BASE_BUNDLE_ID}${variant.bundleSuffix}`;
 const LOCATION_PERMISSION_FR =
   'Water Finder utilise votre position uniquement lorsque l’application est ouverte, pour afficher les points d’eau autour de vous. Votre position n’est ni enregistrée ni partagée.';
 
+/**
+ * AdMob : identifiants d'application (publics). Sans variable, identifiants de démonstration
+ * officiels de Google, utilisables uniquement en développement.
+ */
+const ADMOB_ANDROID_APP_ID =
+  process.env.ADMOB_ANDROID_APP_ID ?? 'ca-app-pub-3940256099942544~3347511713';
+const ADMOB_IOS_APP_ID = process.env.ADMOB_IOS_APP_ID ?? 'ca-app-pub-3940256099942544~1458002511';
+
+if (IS_PRODUCTION && (!process.env.ADMOB_ANDROID_APP_ID || !process.env.ADMOB_IOS_APP_ID)) {
+  // Un build de production avec les identifiants de démonstration ne génère aucun revenu.
+  console.warn('ADMOB_ANDROID_APP_ID / ADMOB_IOS_APP_ID absents : identifiants de test utilisés.');
+}
+
+const TRACKING_PERMISSION_FR =
+  'Votre identifiant publicitaire permet d’afficher des publicités plus pertinentes qui financent Water Finder, gratuit. Vous pouvez refuser : l’application reste entièrement utilisable.';
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: variant.name,
@@ -121,7 +137,30 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     ],
     'expo-localization',
     'expo-web-browser',
+    'expo-secure-store',
     '@maplibre/maplibre-react-native',
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'Water Finder accède aux photos que vous choisissez pour illustrer un point d’eau.',
+        cameraPermission:
+          'Water Finder utilise l’appareil photo pour photographier un point d’eau.',
+        // Aucune vidéo : le micro n'est jamais demandé.
+        microphonePermission: false,
+      },
+    ],
+    ['expo-tracking-transparency', { userTrackingPermission: TRACKING_PERMISSION_FR }],
+    [
+      'react-native-google-mobile-ads',
+      {
+        androidAppId: ADMOB_ANDROID_APP_ID,
+        iosAppId: ADMOB_IOS_APP_ID,
+        // Aucune mesure avant le parcours de consentement.
+        delayAppMeasurementInit: true,
+        userTrackingUsageDescription: TRACKING_PERMISSION_FR,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

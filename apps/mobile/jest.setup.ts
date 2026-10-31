@@ -26,3 +26,36 @@ import i18n from '@/i18n';
 beforeAll(async () => {
   await i18n.changeLanguage('fr');
 });
+
+// Modules natifs des fonctionnalités communautaires et publicitaires.
+jest.mock('expo-secure-store', () => ({
+  getItemAsync: jest.fn(() => Promise.resolve(null)),
+  setItemAsync: jest.fn(() => Promise.resolve()),
+  deleteItemAsync: jest.fn(() => Promise.resolve()),
+}));
+
+jest.mock('expo-tracking-transparency', () => ({
+  requestTrackingPermissionsAsync: jest.fn(() => Promise.resolve({ status: 'denied' })),
+}));
+
+jest.mock('react-native-google-mobile-ads', () => ({
+  __esModule: true,
+  default: () => ({ initialize: jest.fn(() => Promise.resolve([])) }),
+  AdsConsent: {
+    gatherConsent: jest.fn(() =>
+      Promise.resolve({ canRequestAds: true, privacyOptionsRequirementStatus: 'REQUIRED' }),
+    ),
+    getUserChoices: jest.fn(() => Promise.resolve({ selectPersonalisedAds: false })),
+    showPrivacyOptionsForm: jest.fn(() =>
+      Promise.resolve({ canRequestAds: true, privacyOptionsRequirementStatus: 'REQUIRED' }),
+    ),
+  },
+  AdsConsentPrivacyOptionsRequirementStatus: { REQUIRED: 'REQUIRED', NOT_REQUIRED: 'NOT_REQUIRED' },
+  BannerAd: () => null,
+  BannerAdSize: { ANCHORED_ADAPTIVE_BANNER: 'ANCHORED_ADAPTIVE_BANNER' },
+  NativeAd: { createForAdRequest: jest.fn(() => Promise.reject(new Error('no fill'))) },
+  NativeAdView: () => null,
+  NativeAsset: () => null,
+  NativeMediaView: () => null,
+  NativeAssetType: {},
+}));

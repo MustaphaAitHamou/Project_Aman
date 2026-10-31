@@ -1,13 +1,12 @@
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
-import { Banner, ListItem, Screen, Section, type IconName } from '@/components/ui';
+import { Banner, Button, ListItem, Screen, Section, type IconName } from '@/components/ui';
+import { useSessionStore } from '@/services/auth/session';
 
-type ContributionKey =
-  'addPoint' | 'reportBroken' | 'reportFixed' | 'addPhoto' | 'suggestEdit' | 'reportMissing';
+type PointAction = 'reportBroken' | 'reportFixed' | 'addPhoto' | 'suggestEdit' | 'reportMissing';
 
-const CONTRIBUTIONS: { key: ContributionKey; icon: IconName }[] = [
-  { key: 'addPoint', icon: 'map-marker-plus' },
+const POINT_ACTIONS: { key: PointAction; icon: IconName }[] = [
   { key: 'reportBroken', icon: 'wrench-outline' },
   { key: 'reportFixed', icon: 'check-circle-outline' },
   { key: 'addPhoto', icon: 'camera-outline' },
@@ -15,23 +14,41 @@ const CONTRIBUTIONS: { key: ContributionKey; icon: IconName }[] = [
   { key: 'reportMissing', icon: 'map-marker-off-outline' },
 ];
 
-/** Onglet « Ajouter » : toutes les contributions exigent un compte (phase 5). */
+/**
+ * Onglet « Ajouter » : ajout d'un nouveau point ; les autres contributions portent sur un point
+ * existant et se font depuis sa fiche (on renvoie donc vers la carte).
+ */
 export default function AddTab() {
   const { t } = useTranslation();
   const router = useRouter();
+  const signedIn = useSessionStore((state) => state.status === 'signedIn');
 
   return (
     <Screen title={t('add.title')} subtitle={t('add.subtitle')} testID="add-screen">
-      <Banner tone="info" icon="account-group-outline" message={t('add.authNotice')} live={false} />
-      <Section>
-        {CONTRIBUTIONS.map(({ key, icon }) => (
+      {!signedIn ? (
+        <Banner
+          tone="info"
+          icon="account-group-outline"
+          message={t('add.authNotice')}
+          live={false}
+        />
+      ) : null}
+      <Button
+        testID="contribute-addPoint"
+        label={t('add.addPoint')}
+        icon="map-marker-plus"
+        size="lg"
+        onPress={() => router.push('/new-point')}
+      />
+      <Section title={t('add.onPointTitle')} footer={t('add.onPointFooter')}>
+        {POINT_ACTIONS.map(({ key, icon }) => (
           <ListItem
             key={key}
             testID={`contribute-${key}`}
             icon={icon}
             title={t(`add.${key}`)}
             subtitle={t(`add.${key}Body`)}
-            onPress={() => router.push('/sign-in')}
+            onPress={() => router.navigate('/')}
           />
         ))}
       </Section>
