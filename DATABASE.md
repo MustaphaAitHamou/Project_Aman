@@ -1,8 +1,9 @@
 # Base de données (Supabase · PostgreSQL · PostGIS)
 
-> **Statut : conception — rien n'est encore implémenté.** Ce document est la proposition de
-> schéma pour la **phase 2**. Il sera ajusté, migré (`supabase/migrations/`) et testé à ce moment-là.
-> Le modèle de domaine correspondant existe déjà et est testé dans `packages/core/src/domain/`.
+> **Statut : implémenté** dans `supabase/migrations/` (7 migrations) et testé par
+> `supabase/tests/database.test.sql` (70 tests pgTAP sur PostgreSQL 16 + PostGIS 3, avec les
+> privilèges par défaut d'un projet Supabase). La conception ci-dessous reste la référence ; la
+> section « Fonctions exposées » liste l'API réellement disponible.
 
 ## Principes
 
@@ -147,3 +148,34 @@ Les fonctions sont `stable`, `security invoker`, et ne renvoient que des points 
 
 Le rôle est lu depuis `profiles.role` via une fonction `security definer` (`auth_role()`), ou
 injecté dans le JWT par un _custom access token hook_.
+
+## Fonctions exposées (implémentées)
+
+| Fonction                                                                                               | Appelants                        | Rôle                                                                                           |
+| ------------------------------------------------------------------------------------------------------ | -------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `water_points_in_bbox(west, south, east, north, filtres…, max_points)`                                 | anon, authenticated              | Points publiés d'une emprise (max + 1 ligne pour signaler la troncature)                       |
+| `water_points_nearby(latitude, longitude, radius_meters, filtres…, max_points)`                        | anon, authenticated              | Plus proches voisins avec distance                                                             |
+| `water_point_detail(point_id)`                                                                         | anon, authenticated              | Fiche complète (sources, photos approuvées, derniers signalements) avec contrôle de visibilité |
+| `submit_water_point(…)`                                                                                | authenticated                    | Proposition (10/24 h, doublon < 15 m refusé, en attente sauf modérateur)                       |
+| `submit_report(point_id, report_type, comment)`                                                        | authenticated                    | Signalement (20/24 h, pas de doublon < 1 h)                                                    |
+| `propose_revision(point_id, changes, comment)`                                                         | authenticated                    | Modification de champs autorisés uniquement                                                    |
+| `register_photo(point_id, storage_path, width, height)`                                                | authenticated                    | Enregistre une photo déposée dans `<uid>/…`                                                    |
+| `my_contributions(max_rows)`, `mark_notifications_read()`, `delete_my_account()`                       | authenticated                    | Espace personnel                                                                               |
+| `moderate_water_point / report / revision / photo(id, decision, reason)`                               | modérateurs                      | Décisions, effets appliqués, notification de l'auteur, journal                                 |
+| `merge_water_points`, `duplicate_candidates`, `admin_stats`, `moderation_queue`, `admin_search_points` | modérateurs                      | Administration                                                                                 |
+| `set_user_role(target_user, new_role)`                                                                 | administrateurs                  | Rôles                                                                                          |
+| `etl_register_source`, `etl_start_run`, `etl_upsert_point`, `etl_finish_run`, `etl_fail_run`           | service_role (connexion serveur) | Imports idempotents                                                                            |
+
+Toutes les autres fonctions (aides internes, déclencheurs) sont révoquées pour `anon` et
+`authenticated`.
+
+### Tests locaux
+
+```bash
+npm run db:test
+```
+
+Nécessite PostgreSQL 16, PostGIS 3 et pgTAP (`PGHOST`, `PGPORT`, `PGUSER`). Le script crée une base
+jetable, applique `supabase/local/supabase-shim.sql` (rôles, schéma `auth`, privilèges par défaut
+de Supabase) puis les migrations, et exécute les tests. Avec Supabase CLI :
+`npx supabase start` applique les mêmes migrations (voir [LOCAL_TESTING.md](LOCAL_TESTING.md)).

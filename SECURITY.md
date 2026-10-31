@@ -24,22 +24,31 @@ sécurité à définir avant la publication).
    compilation en production, signalé par un bandeau permanent, et exclu des bundles lorsqu'il
    n'est pas activé (vérifié sur les bundles exportés).
 
-## Mesures prévues par phase
+## Mesures en place
 
-| Phase | Mesures                                                                                                                                                                                                                                                                                                        |
-| ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2     | RLS sur toutes les tables, fonctions RPC `security invoker`, contraintes métier en base, sessions Supabase stockées via `expo-secure-store`                                                                                                                                                                    |
-| 3     | Imports via secrets CI, validation stricte des données entrantes, journalisation des erreurs                                                                                                                                                                                                                   |
-| 5     | Authentification obligatoire pour contribuer, limitation de fréquence (base + Edge Functions), modération, détection de doublons, vérification des fichiers (type MIME réel, taille, suppression des métadonnées EXIF de localisation), rôles utilisateur / modérateur / administrateur, suppression de compte |
-| 6     | Consentement UMP (RGPD/ePrivacy) avant toute publicité personnalisée, ATT sur iOS si nécessaire, application utilisable en cas de refus                                                                                                                                                                        |
-| 7     | Administration : opérations sensibles côté serveur, contrôle des rôles, journal des actions de modération                                                                                                                                                                                                      |
-| 8     | Audit des dépendances, revue de sécurité, tests d'autorisations (RLS)                                                                                                                                                                                                                                          |
+| Domaine         | Mesures                                                                                                                                                                                   |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base de données | RLS sur toutes les tables ; écritures uniquement par fonctions SQL `security definer` à `search_path` fixé ; fonctions internes révoquées (testé avec les privilèges par défaut Supabase) |
+| Intégrité       | Contrainte « certifiée ⇒ preuve officielle datée » en base et dans l'application ; une contribution ne certifie jamais ; rôle non modifiable par l'utilisateur (déclencheur)              |
+| Contributions   | Compte obligatoire ; quotas (10 points, 20 signalements / 24 h) ; doublons à 15 m refusés ; modération avant publication ; journal des décisions                                          |
+| Photos          | Compartiment privé, dossier par utilisateur, JPEG/WebP ≤ 6 Mio, chemin validé en SQL, réencodage côté application (EXIF et position supprimés), URL signées temporaires                   |
+| Comptes         | Confirmation d'e-mail, mot de passe ≥ 8, session dans le trousseau / Keystore (`expo-secure-store`), suppression de compte (contributions publiées anonymisées)                           |
+| Publicité       | UMP (TCF) avant toute publicité personnalisée, ATT après consentement, non personnalisé en cas de refus, mesure AdMob différée jusqu'au consentement, aucune publicité forcée             |
+| Administration  | Pas de clé `service_role` ; rôle vérifié en base à chaque page et action ; en-têtes anti-iframe, `noindex`                                                                                |
+| Imports         | Connexion serveur via secret CI ; validation stricte des données entrantes ; aucune suppression ; journal d'erreurs                                                                       |
+
+## Revue du 31/10/2026
+
+- **Corrigé** : `authenticated` pouvait exécuter `notify_user` et `log_moderation` sur un vrai
+  projet Supabase (privilèges par défaut) ; révocation et tests ajoutés.
+- Recherche de secrets dans les fichiers versionnés : aucun.
+- `npm audit` : alertes limitées à l'outillage de build et de test (Expo CLI, Jest) ; correctif
+  automatique refusé car il rétrograderait le SDK Expo.
 
 ## Dépendances
 
 - Versions alignées sur le SDK Expo (contrôle `expo-doctor`) ; fichier de verrouillage versionné.
-- `npm audit` à intégrer à la CI en phase 8 (les avertissements actuels proviennent de
-  dépendances transitives de l'outillage de test et de build).
+- `npm audit --omit=dev` à relancer à chaque mise à jour du SDK Expo.
 
 ## Accessibilité (sécurité d'usage)
 

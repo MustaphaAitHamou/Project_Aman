@@ -477,7 +477,9 @@ language sql stable security definer set search_path = public as $$
 $$;
 
 -- ── Droits d'exécution ───────────────────────────────────────────────────────
-revoke execute on all functions in schema public from public, anon;
+-- Supabase accorde par défaut EXECUTE à anon et authenticated sur toute nouvelle fonction :
+-- tout est révoqué, puis seules les fonctions d'API sont réouvertes ci-dessous.
+revoke execute on all functions in schema public from public, anon, authenticated;
 grant execute on function public.water_points_in_bbox, public.water_points_nearby,
   public.water_point_detail, public.water_point_matches_filters, public.is_moderator,
   public.is_admin, public.current_user_role to anon, authenticated;

@@ -4,21 +4,46 @@
 > vérification de son existence, de sa licence, de son format, de sa date, de ses champs et de ses
 > conditions d'utilisation. Une source en échec est journalisée sans bloquer les autres.
 
-## État des vérifications
+## État des vérifications (31/10/2026)
 
-L'environnement de développement de la phase 1 **n'avait pas accès** aux sites concernés
-(data.gouv.fr, portails des collectivités, OpenStreetMap/Overpass, openfreemap.org : connexions
-refusées par la politique réseau). **Aucune source de point d'eau n'a donc encore été vérifiée ni
-intégrée.** Tout ce qui suit sur les jeux de données est une liste de **candidats à vérifier en
-phase 3**, pas une description validée.
+Les connecteurs sont **écrits et testés avec des réponses simulées**, mais l'environnement de
+développement n'a **jamais pu joindre** les services publics (politique réseau). Aucune donnée
+réelle n'a encore été importée. Le premier import réel se fait pendant votre recette locale
+([LOCAL_TESTING.md](LOCAL_TESTING.md), étape 2).
 
-| Source                                                   | Usage                  | Statut                                          |
-| -------------------------------------------------------- | ---------------------- | ----------------------------------------------- |
-| OpenFreeMap (tuiles vectorielles OSM)                    | Fond de carte          | **Utilisée par défaut, conditions à confirmer** |
-| OpenStreetMap                                            | Points d'eau           | À intégrer (phase 3)                            |
-| Schéma national « fontaine à eau » (schema.data.gouv.fr) | Format de référence    | À étudier (phase 3)                             |
-| Jeux de données des collectivités                        | Points d'eau officiels | À rechercher et vérifier (phase 3)              |
-| Contributions des utilisateurs                           | Ajouts, signalements   | Phase 5                                         |
+| Clé du connecteur         | Source                                      | Statut dans le code                      | À faire                                                      |
+| ------------------------- | ------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------ |
+| `osm-fr`                  | OpenStreetMap via Overpass                  | `verified: true` (tags du wiki OSM)      | Premier import réel ; avis ODbL ; limites d'usage d'Overpass |
+| `datagouv-fontaines`      | Jeux « fontaines » trouvés sur data.gouv.fr | `verified: false` → `--allow-unverified` | Vérifier chaque jeu (fiche ci-dessous) avant import          |
+| `paris-fontaines-a-boire` | Ville de Paris (Opendatasoft)               | `verified: false` → `--allow-unverified` | Confirmer identifiant du jeu, licence et champs              |
+| —                         | Géoplateforme IGN (géocodage)               | Utilisé par l'application                | Confirmer format de réponse et conditions d'usage            |
+| —                         | OpenFreeMap (fond de carte)                 | Utilisé par défaut                       | Confirmer conditions d'usage commercial                      |
+
+### Commandes
+
+```bash
+npm run etl -- list
+```
+
+```bash
+npm run etl -- discover fontaines
+```
+
+```bash
+SUPABASE_DB_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres npm run etl -- import osm-fr --bbox=2.22,48.81,2.47,48.91 --dry-run
+```
+
+Règles appliquées par tous les connecteurs :
+
+- coordonnées absentes, nulles ou non WGS84 (ex. Lambert 93) → enregistrement rejeté et journalisé ;
+- seuls les champs présents sont repris (rien n'est déduit ni inventé) ;
+- un jeu officiel de fontaines à boire donne « indiquée potable » avec une preuve
+  `official_dataset` datée de la mise à jour du jeu — **jamais « certifiée » automatiquement** ;
+- OpenStreetMap ne remplace jamais une potabilité officielle ou communautaire ;
+- un point déjà connu à moins de 10 m (autre source) est rattaché, pas dupliqué ;
+- import idempotent (empreinte du contenu), aucun point supprimé ;
+- une source en échec est journalisée (`import_runs.error_log`) sans bloquer les autres ;
+- structure d'un jeu modifiée (champ requis absent) → import annulé explicitement.
 
 ## Fond de carte
 
@@ -44,16 +69,17 @@ L'attribution OpenStreetMap est affichée par la carte (bouton d'attribution) et
 
 **Licence : ODbL 1.0.** Attribution « © les contributeurs d'OpenStreetMap ».
 
-⚠️ **Point juridique à valider avant la phase 3** : l'ODbL impose le partage à l'identique d'une
+⚠️ **Point juridique à valider avant la production** : l'ODbL impose le partage à l'identique d'une
 _base de données dérivée_ utilisée publiquement. Si des données OSM sont fusionnées avec des données
 officielles ou communautaires dans une même table, cette base pourrait devoir être publiée sous
 ODbL. Option envisagée : garder les données OSM séparables (« base de données collective ») et
 tracer la provenance champ par champ (`water_point_sources`). Avis juridique recommandé.
 
-**Accès aux données** : extraits Geofabrik (fichier France mis à jour quotidiennement) filtrés avec
-`osmium tags-filter`, plutôt que les instances publiques d'Overpass (limites d'usage). À confirmer.
+**Accès aux données** : API Overpass (`OVERPASS_URL`, par défaut `overpass-api.de`), requête
+par emprise (`--bbox`) ou France entière. Pour un import national régulier, l'instance publique
+impose des limites : prévoir une instance dédiée ou des extraits Geofabrik filtrés.
 
-**Tags candidats (sémantique à confirmer sur le wiki OSM en phase 3)** :
+**Tags utilisés** (implémentés dans `packages/importers/src/connectors/osm.ts`, testés) :
 
 | Tag                                                      | Interprétation prévue                           | Potabilité déduite                                        |
 | -------------------------------------------------------- | ----------------------------------------------- | --------------------------------------------------------- |
@@ -106,11 +132,17 @@ Vérifié le / par       :
 
 ## Géocodage (phase 4)
 
-Recherche d'adresses françaises : API de la Base Adresse Nationale / Géoplateforme
-(URL et conditions à vérifier). En phase 1, la recherche se limite à une liste de grandes villes
-embarquée (coordonnées de centre-ville servant uniquement à cadrer la carte).
+Recherche d'adresses françaises via le service de géocodage de la **Géoplateforme (IGN)**,
+successeur de l'API Adresse : `https://data.geopf.fr/geocodage/search?q=…&index=address`
+(réponse GeoJSON, sans clé). Configurable par `EXPO_PUBLIC_GEOCODING_URL`. Seul le texte saisi
+est envoyé (jamais la position), après 3 caractères et 350 ms d'inactivité. Attribution affichée
+sous les résultats. Format et conditions d'usage à confirmer lors de la recette (hôte bloqué ici).
+La liste embarquée de grandes villes reste disponible hors ligne.
 
 ## Contributions (phase 5)
 
 Ajouts, signalements de panne / remise en service, photos, corrections : modérés, historisés,
-avec limitation de fréquence. **Une contribution ne certifie jamais la potabilité.**
+avec limitation de fréquence (10 points et 20 signalements par 24 h). **Une contribution ne
+certifie jamais la potabilité** : au mieux « indiquée potable », et une potabilité certifiée
+n'est jamais rétrogradée par un avis d'utilisateur (seul un signalement « non potable » validé
+s'applique, par précaution).

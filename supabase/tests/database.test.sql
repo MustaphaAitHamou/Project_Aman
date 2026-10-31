@@ -4,7 +4,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set search_path = public, extensions;
 
-select plan(66);
+select plan(70);
 
 -- ── Données de test (fictives, dans une transaction annulée à la fin) ───────
 insert into auth.users (id, email) values
@@ -145,6 +145,16 @@ select is((select count(*)::int from favorites), 0, 'Bob ne voit pas les favoris
 select is((select count(*)::int from water_points where name = 'Robinet Alice'), 0,
   'Bob ne voit pas le point en attente d''Alice');
 reset role;
+
+-- ── Fonctions internes : jamais appelables directement ──────────────────────
+select ok(not has_function_privilege('authenticated', 'public.notify_user(uuid, text, jsonb)', 'execute'),
+  'un utilisateur ne peut pas créer de notification arbitraire');
+select ok(not has_function_privilege('authenticated', 'public.log_moderation(text, uuid, text, text)', 'execute'),
+  'un utilisateur ne peut pas écrire dans le journal de modération');
+select ok(not has_function_privilege('authenticated', 'public.etl_upsert_point(uuid, text, jsonb)', 'execute'),
+  'un utilisateur ne peut pas lancer d''import');
+select ok(not has_function_privilege('anon', 'public.submit_report(uuid, public.report_type, text)', 'execute'),
+  'un visiteur ne peut pas contribuer');
 
 -- ── Administration : lecture réservée aux modérateurs ───────────────────────
 set local role authenticated;

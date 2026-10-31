@@ -10,10 +10,10 @@ publicité, avec consentement.
 Priorité géographique : la France, avec une architecture prévue pour l'international.
 Publication visée : **juin 2027**.
 
-> **État actuel : phase 1 terminée** (initialisation, architecture, navigation, design system,
-> première carte, services de géolocalisation). Aucune donnée réelle de point d'eau n'est encore
-> branchée : le backend arrive en phase 2 et les imports officiels/OSM en phase 3.
-> Voir [PROGRESS.md](PROGRESS.md).
+> **État actuel : phases 1 à 7 développées** (application, backend Supabase/PostGIS, imports de
+> données publiques, comptes et contributions modérées, publicité avec consentement,
+> administration web). **Rien n'est déployé.** Étape suivante : recette locale complète avec de
+> vraies données — [LOCAL_TESTING.md](LOCAL_TESTING.md). Détails : [PROGRESS.md](PROGRESS.md).
 
 | Onboarding                                      | Carte (mode démo)                               | Panneau d'un point                                       | Recherche                                      | Profil (sombre)                                    |
 | ----------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------- |
@@ -42,7 +42,11 @@ l'environnement de développement n'avait pas accès aux tuiles._
 npm install
 npm run check          # formatage, types, lint et tests de tout le monorepo
 npm run mobile:web     # aperçu web (http://localhost:8081)
+npm run admin          # administration (http://localhost:3001)
 ```
+
+Tester toute la chaîne avec de vraies données (Supabase local + imports) :
+[LOCAL_TESTING.md](LOCAL_TESTING.md).
 
 L'application native utilise MapLibre (module natif) : elle nécessite un **development build**
 (Expo Go ne suffit pas). Procédure complète : [SETUP.md](SETUP.md).
@@ -52,7 +56,10 @@ L'application native utilise MapLibre (module natif) : elle nécessite un **deve
 ```
 water-finder/
 ├── apps/mobile/          Application Expo (React Native, Expo Router, TypeScript strict)
+├── apps/admin/           Administration Next.js (modération, doublons, imports)
 ├── packages/core/        Domaine partagé : statuts, règles de potabilité, filtres, géo-utilitaires
+├── packages/importers/   Imports ETL (OpenStreetMap, data.gouv.fr, Opendatasoft)
+├── supabase/             Migrations PostgreSQL/PostGIS, RLS, tests pgTAP
 ├── docs/screenshots/     Captures de référence par phase
 ├── tools/                Outils (génération des icônes)
 └── .github/workflows/    Intégration continue
@@ -60,16 +67,17 @@ water-finder/
 
 ## Documentation
 
-| Document                           | Contenu                                                     |
-| ---------------------------------- | ----------------------------------------------------------- |
-| [SETUP.md](SETUP.md)               | Installation, lancement, development build, tests           |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Stack, versions, organisation du code, décisions techniques |
-| [DATABASE.md](DATABASE.md)         | Schéma PostgreSQL/PostGIS prévu (phase 2)                   |
-| [DATA_SOURCES.md](DATA_SOURCES.md) | Sources de données, licences, état des vérifications        |
-| [DEPLOYMENT.md](DEPLOYMENT.md)     | Environnements, EAS Build/Submit, stores, Vercel            |
-| [SECURITY.md](SECURITY.md)         | Sécurité, confidentialité, permissions                      |
-| [PROGRESS.md](PROGRESS.md)         | Avancement détaillé, tests exécutés, points bloquants       |
-| [ROADMAP.md](ROADMAP.md)           | Les 8 phases jusqu'au lancement                             |
+| Document                             | Contenu                                                     |
+| ------------------------------------ | ----------------------------------------------------------- |
+| [SETUP.md](SETUP.md)                 | Installation, lancement, development build, tests           |
+| [ARCHITECTURE.md](ARCHITECTURE.md)   | Stack, versions, organisation du code, décisions techniques |
+| [DATABASE.md](DATABASE.md)           | Schéma PostgreSQL/PostGIS, RLS, fonctions exposées          |
+| [LOCAL_TESTING.md](LOCAL_TESTING.md) | Recette locale complète avant toute préproduction           |
+| [DATA_SOURCES.md](DATA_SOURCES.md)   | Sources de données, licences, état des vérifications        |
+| [DEPLOYMENT.md](DEPLOYMENT.md)       | Environnements, EAS Build/Submit, stores, Vercel            |
+| [SECURITY.md](SECURITY.md)           | Sécurité, confidentialité, permissions                      |
+| [PROGRESS.md](PROGRESS.md)           | Avancement détaillé, tests exécutés, points bloquants       |
+| [ROADMAP.md](ROADMAP.md)             | Les 8 phases jusqu'au lancement                             |
 
 ## Licence
 

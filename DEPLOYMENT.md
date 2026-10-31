@@ -71,27 +71,50 @@ publication publique automatique.
 
 1. `npm ci`
 2. Formatage (Prettier), typage (routes typées incluses), lint, tests
-3. Export des bundles web, Android et iOS (vérifie que Metro et Hermes compilent l'application)
+3. Base de données : PostgreSQL 16 + PostGIS + pgTAP, migrations et tests SQL, puis chargement
+   ETL réel en base (tests d'intégration des importeurs)
+4. Export des bundles web, Android et iOS (vérifie que Metro et Hermes compilent l'application)
+   et build de l'administration Next.js
+
+`.github/workflows/etl.yml` : imports hebdomadaires (lundi 03:17 UTC) ou manuels ; ignoré tant
+que le secret `SUPABASE_DB_URL` n'est pas défini.
 
 Les builds EAS et soumissions ne sont **pas** déclenchés automatiquement.
 
 ## Backend (phase 2)
 
 Projets Supabase distincts par environnement ; migrations versionnées dans `supabase/migrations`
-appliquées par la CLI Supabase. La clé `service_role` vit uniquement dans les secrets GitHub
-Actions (ETL) et Vercel (administration).
+appliquées par la CLI Supabase (`npx supabase link` puis `npx supabase db push`, **après
+accord**). Réglages d'authentification à reporter dans le projet en ligne : confirmation
+d'e-mail, mot de passe ≥ 8, URL de redirection (`supabase/config.toml`), SMTP personnalisé.
+Aucune application n'utilise la clé `service_role` ; les imports utilisent une chaîne de
+connexion PostgreSQL (`SUPABASE_DB_URL`) stockée dans les secrets GitHub.
 
 ## Administration (phase 7)
 
-Application Next.js déployée sur **Vercel** (projets preview/staging/production). Opérations
-sensibles exécutées côté serveur uniquement.
+Application Next.js (`apps/admin`) prévue sur **Vercel** — **non déployée**. Configuration :
+projet Vercel avec « Root Directory » = `apps/admin` (`vercel.json` fourni), variables
+`NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` uniquement. L'accès est contrôlé
+par le rôle en base (modérateur / administrateur) ; recommandé en plus : protection par mot de
+passe ou SSO Vercel sur les déploiements.
+
+## Publicité (phase 6)
+
+1. Créer l'application dans AdMob (iOS et Android) et les blocs : bannière adaptative, native
+   (interstitiel facultatif, désactivé dans le code).
+2. Renseigner `ADMOB_ANDROID_APP_ID`, `ADMOB_IOS_APP_ID` et `EXPO_PUBLIC_ADMOB_*` dans les
+   variables EAS du profil production.
+3. Configurer le message RGPD (UMP) dans AdMob → Confidentialité et messages, et le message
+   d'explication ATT pour iOS.
+4. Publier un fichier `app-ads.txt` sur le site du développeur.
+5. Déclarer la collecte publicitaire dans App Privacy (Apple) et Sécurité des données (Google).
 
 ## Secrets
 
-| Secret                                         | Où le stocker                            |
-| ---------------------------------------------- | ---------------------------------------- |
-| `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_DB_URL` | GitHub Actions secrets, Vercel (serveur) |
-| Identifiants Apple / Google pour la soumission | EAS (credentials)                        |
-| `EXPO_TOKEN` (CI EAS, si utilisé)              | GitHub Actions secrets                   |
+| Secret                                         | Où le stocker          |
+| ---------------------------------------------- | ---------------------- |
+| `SUPABASE_DB_URL` (imports ETL)                | GitHub Actions secrets |
+| Identifiants Apple / Google pour la soumission | EAS (credentials)      |
+| `EXPO_TOKEN` (CI EAS, si utilisé)              | GitHub Actions secrets |
 
 Jamais dans le dépôt, jamais dans une variable `EXPO_PUBLIC_*`.

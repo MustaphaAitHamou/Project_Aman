@@ -28,8 +28,16 @@ npm install
 cp .env.example apps/mobile/.env
 ```
 
-En phase 1, aucune variable n'est obligatoire : sans configuration, l'application utilise le style
-de carte OpenFreeMap et n'affiche aucun point d'eau (aucune source n'est encore branchée).
+Sans configuration Supabase, l'application s'ouvre mais n'affiche aucun point d'eau et désactive
+les comptes (message explicite). Pour un backend local complet (Supabase via Docker) et des
+imports de vraies données, suivre [LOCAL_TESTING.md](LOCAL_TESTING.md). Variables minimales :
+
+```bash
+EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
+EXPO_PUBLIC_SUPABASE_ANON_KEY=<anon key de « npx supabase status »>
+```
+
+Administration : `apps/admin/.env.local` (modèle `apps/admin/.env.example`), puis `npm run admin`.
 Détail de chaque variable : [.env.example](.env.example).
 
 Pour tester l'interface de la carte avec des **données fictives** (développement uniquement) :
@@ -51,7 +59,13 @@ npm run check
 ```
 
 Enchaîne : formatage (Prettier), typage (TypeScript strict, routes typées incluses), lint
-(ESLint), tests (Jest pour l'application, Vitest pour `core`).
+(ESLint), tests (Jest pour l'application, Vitest pour `core`, `importers` et `admin`).
+
+Tests SQL (PostgreSQL 16 + PostGIS + pgTAP installés localement) :
+
+```bash
+npm run db:test
+```
 
 Commandes séparées :
 

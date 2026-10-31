@@ -1,176 +1,154 @@
 # Avancement — Water Finder
 
-_Dernière mise à jour : 30/10/2026 — fin de la phase 1._
+_Dernière mise à jour : 31/10/2026 — phases 1 à 7 développées, phase 8 en cours (recette locale
+par le porteur du projet)._
 
 ## Résumé
 
-| Phase                                                                                        | État                                                   |
-| -------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| 1 — Initialisation, architecture, navigation, design system, première carte, géolocalisation | ✅ **Terminée** (vérifiée hors appareil, voir limites) |
-| 2 — Backend Supabase / PostGIS                                                               | ⏳ Prochaine étape                                     |
-| 3 à 8                                                                                        | À venir ([ROADMAP.md](ROADMAP.md))                     |
+| Phase                                                                  | État                                                                                                  |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| 1 — Socle, navigation, design system, carte, géolocalisation           | ✅ Terminée                                                                                           |
+| 2 — Backend Supabase / PostGIS (schéma, RLS, API SQL)                  | ✅ Développée, testée sur PostgreSQL 16 + PostGIS local (70 tests pgTAP)                              |
+| 3 — Imports ETL (OpenStreetMap, data.gouv.fr, Opendatasoft)            | ✅ Développée ; chargement testé en base ; **jamais exécutée sur les vraies API** (réseau bloqué ici) |
+| 4 — Géocodage, fiche complète, partage, favoris                        | ✅ Développée, testée (tests automatisés)                                                             |
+| 5 — Comptes, contributions, modération côté application, notifications | ✅ Développée, testée (tests automatisés + SQL)                                                       |
+| 6 — AdMob, consentement UMP, ATT                                       | ✅ Développée ; **non testée sur appareil** (module natif)                                            |
+| 7 — Administration Next.js                                             | ✅ Développée ; build et redirections testés ; parcours connecté non testé ici                        |
+| 8 — Sécurité, tests, documentation, recette                            | ⏳ En cours : revue de sécurité faite, recette locale à faire ([LOCAL_TESTING.md](LOCAL_TESTING.md))  |
 
-**Aucune donnée réelle de point d'eau n'est encore affichée** : aucune source n'est branchée
-(phases 2-3). L'application l'indique clairement sur la carte.
+**Rien n'est déployé** : aucun projet Supabase en ligne, aucun déploiement Vercel, aucune
+soumission aux stores. Prochaine étape : votre recette manuelle locale.
 
-**Dépôt** : <https://github.com/MustaphaAitHamou/Project_Aman> (public, branche `main`), avec
-intégration continue GitHub Actions.
-
----
-
-## Fonctionnalités terminées (phase 1)
-
-### Socle
-
-- Monorepo npm workspaces : `apps/mobile` (Expo SDK 58 / RN 0.88 / React 19.3 / Expo Router 58)
-  et `packages/core` (domaine partagé).
-- TypeScript strict partout (`noUncheckedIndexedAccess`), routes typées Expo Router.
-- ESLint (eslint-config-expo), Prettier, Jest (application), Vitest (core).
-- `app.config.ts` par environnement (development / staging / production) : noms, identifiants,
-  schémas d'URL distincts ; refus du mode démo en production ; refus d'un `APP_ENV` invalide.
-- Permissions minimales (localisation au premier plan uniquement) bloquées explicitement.
-- Icône, icône adaptative Android (avec monochrome), écran de lancement clair/sombre, favicon
-  (sources SVG + script de génération).
-- `eas.json` (development, development-simulator, staging, production ; submit préparé).
-- CI GitHub Actions : qualité (formatage, types, lint, tests) + bundles web/Android/iOS.
-
-### Domaine (`packages/core`)
-
-- Modèle d'un point d'eau avec **trois statuts distincts** : potabilité, fonctionnement,
-  disponibilité ; type d'eau (plate/gazeuse), gratuité, accessibilité, horaires, sources.
-- Règle de certification : `certified_potable` exige une preuve officielle **datée** ; sinon
-  rétrogradation en « indiquée potable ». Une contribution ne certifie jamais.
-- Ancienneté de l'information (récente < 90 j, ancienne > 365 j, inconnue).
-- Filtres (potabilité, hors service, gazeuse, gratuit, PMR, fontaines décoratives) ; un point
-  « n'existe plus » n'est jamais affiché.
-- Géo : distance haversine, formatage localisé (m/km, ft/mi), emprises (agrandissement,
-  quantification pour le cache), URL d'itinéraire Apple Plans / Google Maps.
-- Interface `WaterPointRepository` (requêtes par emprise, par identifiant, plus proches voisins).
-
-### Application
-
-- **Design system** : jetons, thèmes clair/sombre (choix Système/Clair/Sombre), typographie,
-  composants (texte, boutons, bouton icône, puces, badges de statut, bandeaux, cartes, listes,
-  sections, contrôle segmenté, interrupteurs, champ de recherche, états vide/chargement/erreur).
-  Contrastes WCAG AA vérifiés par tests.
-- **i18n** : français (référence) et anglais complets, typés ; langue Système/Français/English.
-- **Navigation** : splash maintenu jusqu'au chargement des préférences, onboarding (3 étapes),
-  écran d'autorisation GPS expliqué (« Pas maintenant » possible), 5 onglets
-  CARTE | RECHERCHE | AJOUTER | ACTIVITÉ | PROFIL avec bouton central mis en avant.
-- **Carte** : MapLibre natif + maplibre-gl web ; position de l'utilisateur et précision ;
-  bouton de recentrage (demande l'autorisation si besoin) ; barre de recherche ; filtres actifs
-  en puces retirables ; légende ; points colorés selon la potabilité, évidés si hors service ;
-  groupes avec compteur (toucher = zoom) ; panneau d'aperçu (statuts, distance, type d'eau,
-  gratuité, PMR, date de vérification, source, avertissement de potabilité, itinéraire, fiche) ;
-  chargement par zone avec cache, zoom minimal 11, plafond 2 000 points ; messages honnêtes
-  (aucune source, zoomez, zone vide, aucun résultat avec filtres, erreur + réessayer,
-  localisation refusée/bloquée/désactivée) ; écran d'erreur si le fond de carte ne charge pas.
-- **Géolocalisation** : service unique `expo-location`, premier plan uniquement, arrêt en
-  arrière-plan, relecture de l'autorisation au retour, dernière position en mémoire seulement.
-- **Recherche** : « Autour de moi » + recherche locale de 40 grandes villes (sans accent ni
-  casse) qui recentre la carte — recherche manuelle quand le GPS est refusé.
-- **Filtres** (modale, appliqués en direct et mémorisés), **légende**, **fiche de base** d'un
-  point, **itinéraire** (Plans/Google Maps sur iOS, Google Maps ailleurs).
-- **Profil** : invité, accès connexion/inscription, favoris, contributions, paramètres,
-  confidentialité, sources des données, version.
-- **Paramètres** : thème, langue, unités, état de l'autorisation + accès aux réglages, revoir la
-  présentation.
-- **Écrans des phases suivantes** (connexion, inscription, favoris, contributions, activité) :
-  explicites, avec retour à la carte — aucun bouton sans effet.
-- **Mode démonstration** (développement uniquement, `EXPO_PUBLIC_DEMO_DATA=true`) : 30 points
-  fictifs nommés « Point de démonstration n°… », bandeau permanent, interdit en production, exclu
-  des bundles lorsqu'il est désactivé.
-
-## Fonctionnalités en cours
-
-Aucune : la phase 1 est close. La phase 2 n'est pas commencée (en attente de validation).
+**Dépôt** : <https://github.com/MustaphaAitHamou/Project_Aman> (branche `main`), CI GitHub Actions.
 
 ---
 
-## Tests réellement exécutés (30/10/2026)
+## Ce qui existe
 
-| Vérification                                                                              | Résultat                                                                                                                                                                                                                   |
-| ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `npm run check` (racine) : Prettier, TypeScript (2 paquets, routes typées), ESLint, tests | ✅ tout passe                                                                                                                                                                                                              |
-| Vitest `packages/core`                                                                    | ✅ 4 fichiers, **32 tests**                                                                                                                                                                                                |
-| Jest `apps/mobile`                                                                        | ✅ 11 suites, **110 tests**                                                                                                                                                                                                |
-| ESLint                                                                                    | ✅ 0 erreur, 0 avertissement                                                                                                                                                                                               |
-| `expo-doctor`                                                                             | ⚠️ 18/20 ; les 2 contrôles en échec exigent l'accès réseau à exp.host / React Native Directory (bloqué ici). Alignement des versions sur le SDK : ✅                                                                       |
-| `expo export` web                                                                         | ✅                                                                                                                                                                                                                         |
-| `expo export` Android + iOS (Metro + compilation Hermes)                                  | ✅ 1 933 / 1 936 modules, bytecode `.hbc` produit                                                                                                                                                                          |
-| `expo prebuild` dev et production (génération des projets natifs)                         | ✅ plugins appliqués ; permissions vérifiées dans le manifeste et l'Info.plist (voir DEPLOYMENT.md)                                                                                                                        |
-| Gardes de configuration                                                                   | ✅ production + démo → refus ; `APP_ENV` invalide → refus ; valeurs staging correctes                                                                                                                                      |
-| Contenu des bundles                                                                       | ✅ données de démo absentes des bundles web/Android/iOS hors mode démo ; maplibre-gl web absent des bundles natifs                                                                                                         |
-| Navigateur (Playwright, Chromium, build web) — parcours standard                          | ✅ onboarding → autorisation → carte → 4 onglets → paramètres → thème sombre, sans erreur JavaScript                                                                                                                       |
-| Navigateur — parcours démo (11 vérifications)                                             | ✅ 11/11 : bandeau démo, toucher d'un point → panneau, nom, distance « à 70 m », 3 statuts distincts, fiche, filtre « Certifiée » + puce, retrait de la puce, recherche « lyo », zone vide à Lyon, message de zoom minimal |
-| Icônes                                                                                    | ✅ générées, dimensions et transparence vérifiées (icône iOS sans alpha)                                                                                                                                                   |
-| CI GitHub Actions sur `main` (premier push, commit `0db28dd`)                             | ✅ job qualité 11/11 étapes, job bundles 10/10 étapes ([exécution 41077597795](https://github.com/MustaphaAitHamou/Project_Aman/actions/runs/41077597795))                                                                 |
+### Base de données (`supabase/`)
 
-Contenu des tests automatisés : règles de potabilité, ancienneté, filtres, distances et formats,
-emprises et cache, URL d'itinéraire ; contrastes WCAG (2 thèmes + marqueurs) ; cohérence FR/EN
-(clés et variables) ; choix de la langue ; dates relatives ; store et pilote de localisation
-(autorisations, suivi, arrêt/reprise en arrière-plan, services désactivés, coordonnées invalides) ;
-priorité des messages de carte ; puces de filtres ; GeoJSON ; **validation des couches par le
-validateur officiel MapLibre** ; recherche de villes ; chargement par zone (absence de source,
-zoom minimal, filtres, réutilisation du cache) ; cohérence des données de démo ; persistance des
-préférences (aucune coordonnée enregistrée) ; composants accessibles ; intégration de l'écran
-carte (points, panneau, distance, navigation, recentrage, filtres, recherche, erreur de fond de carte).
+- 7 migrations : schéma (potabilité / fonctionnement / disponibilité séparés, contrainte de
+  certification, index GiST), RLS sur toutes les tables, API de lecture (`water_points_in_bbox`,
+  `water_points_nearby`, `water_point_detail`), contributions (ajout, signalement, modification,
+  photo — quotas, détection de doublon à 15 m, file de modération), modération, fusion,
+  statistiques, suppression de compte, imports (`etl_*`, idempotents, sans suppression),
+  stockage des photos (compartiment privé), administration (`moderation_queue`,
+  `admin_search_points`).
+- Détails : [DATABASE.md](DATABASE.md).
 
-### Non testé (impossible dans l'environnement de la phase 1)
+### Imports (`packages/importers`)
 
-- **Aucune exécution sur iPhone, Android, simulateur ou émulateur** (pas de SDK Android ni de
-  Xcode) : rendu natif MapLibre, dialogues de permission natifs, retour haptique, performances
-  sur un téléphone de milieu de gamme.
-- **Compilation native** Gradle / Xcode (seuls les bundles JS et la génération des projets ont
-  été vérifiés).
-- **Tuiles réelles** : le fond de carte OpenFreeMap n'a jamais pu être chargé (hôte bloqué) ;
-  les tests navigateur utilisaient un style local uni. La police des compteurs
-  (`Noto Sans Bold`) n'est pas vérifiée sur le serveur de glyphes.
-- GPS réel (position simulée dans le navigateur ; logique native testée avec des mocks).
-- Lecteurs d'écran (VoiceOver / TalkBack) en conditions réelles.
+- Connecteurs : OpenStreetMap (Overpass), data.gouv.fr (recherche + CSV/JSON/GeoJSON génériques),
+  Opendatasoft (Ville de Paris « fontaines à boire »).
+- Client HTTP avec reprises et délai ; transformation défensive (coordonnées non WGS84 rejetées,
+  rien d'inventé) ; aucune source ne certifie automatiquement la potabilité ; une source non
+  vérifiée exige `--allow-unverified`.
+- CLI `npm run etl -- list | discover | import` ; workflow GitHub hebdomadaire (inactif tant que
+  le secret `SUPABASE_DB_URL` n'est pas défini).
+- Détails : [DATA_SOURCES.md](DATA_SOURCES.md).
 
-## Bugs et limites identifiés
+### Application (`apps/mobile`)
 
-| #   | Description                                                                                    | Gravité                                   | Piste                                                     |
-| --- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------------------- |
-| 1   | Validation sur appareil réel non faite                                                         | Haute (avant phase 2)                     | Development build EAS + recette manuelle                  |
-| 2   | Conditions d'utilisation d'OpenFreeMap non vérifiées                                           | Haute (avant production)                  | Voir DATA_SOURCES.md                                      |
-| 3   | Le panneau d'aperçu ne se glisse pas au doigt (fermeture par bouton ou toucher de la carte)    | Faible                                    | Feuille glissante avec Gesture Handler 3 (phase 4)        |
-| 4   | « Localisation de l'appareil désactivée » ouvre les réglages de l'app, pas ceux du GPS         | Faible                                    | `enableNetworkProviderAsync` sur Android                  |
-| 5   | Un point sélectionné reste ouvert s'il est regroupé après un dézoom                            | Faible                                    | Fermer le panneau quand le point n'est plus visible       |
-| 6   | En mode démo, la source affichée d'un point « certifié » est « Données publiques officielles » | Faible (démo uniquement, bandeau présent) | —                                                         |
-| 7   | Traduction anglaise non relue par un natif                                                     | Moyenne                                   | Relecture avant publication                               |
-| 8   | ESLint 9 signalé « non maintenu » par npm                                                      | Faible                                    | Passer à ESLint 10 quand eslint-config-expo le supportera |
-| 9   | Avertissements npm de dépendances transitives obsolètes (outillage de test)                    | Faible                                    | Suivre les mises à jour Expo / Jest                       |
-| 10  | `packages/core` sans ESLint (couvert par TypeScript strict + tests)                            | Faible                                    | Ajouter une config ESLint TS                              |
-| 11  | Le premier typecheck démarre brièvement Metro pour générer les routes typées                   | Faible                                    | Normal avec Expo Router                                   |
+- Phase 1 : carte MapLibre, géolocalisation premier plan, filtres, légende, onboarding,
+  paramètres, i18n FR/EN, thèmes, mode démo réservé au développement.
+- Données réelles via Supabase (sinon message explicite « aucune source »).
+- Recherche d'adresses (Géoplateforme IGN / BAN), temporisée ; seul le texte saisi est envoyé.
+- Fiche complète : statuts, preuve de potabilité (type, source, date, lien), informations,
+  horaires, photos (URL signées), derniers signalements, provenance, itinéraire, partage, favori,
+  actions de contribution, bannière publicitaire en bas.
+- Comptes : inscription (confirmation e-mail), connexion, mot de passe oublié, pseudonyme,
+  déconnexion, suppression du compte ; session dans le stockage sécurisé de l'appareil.
+- Contributions : ajout de point (position GPS précise ≤ 50 m ou centre de la carte zoomée),
+  signalements, modifications (seuls les champs changés sont envoyés), photos réencodées en JPEG
+  (EXIF et position supprimés, 1 600 px max) ; favoris ; « Mes contributions » ; onglet
+  Activité (décisions de modération).
+- Publicité : consentement UMP après la présentation (jamais au premier écran), puis ATT sur
+  iOS ; bannière adaptative et annonce native signalées « Publicité » (fiche, recherche) ;
+  annonces non personnalisées en cas de refus ; blocs de test Google hors production ;
+  interstitiels préparés mais désactivés ; aucune publicité sur le web ; gestion des choix dans
+  Confidentialité.
 
-## Accès externes manquants
+### Administration (`apps/admin`)
 
-**Réseau de l'environnement cloud** (connexions refusées par la politique réseau) :
-`tiles.openfreemap.org`, `openfreemap.org`, `data.gouv.fr`, `schema.data.gouv.fr`,
-`opendata.paris.fr`, `overpass-api.de`, `expo.dev` / `exp.host`, `dl.google.com` (SDK Android),
-`maplibre.org`, dépôts GitHub publics. **Indispensable pour la phase 3** (données officielles et
-OSM) ; à autoriser dans les paramètres réseau de l'environnement.
+- Next.js 16, connexion modérateur, tableau de bord, modération (effet attendu affiché avant
+  validation, tableau avant/après pour les modifications, aperçu des photos), doublons et
+  fusion, recherche de points avec carte, historique des imports et erreurs, gestion des rôles
+  (administrateurs).
+- Aucune clé `service_role` : session Supabase + RLS + fonctions SQL réservées aux modérateurs.
+- En-têtes de sécurité, non indexée ; `vercel.json` préparé, **non déployé**.
 
-**Comptes et décisions du porteur de projet :**
+---
 
-- Compte Expo / EAS (development builds), Apple Developer, Google Play Console.
-- Projet Supabase (phase 2) — ou accord pour développer d'abord sur une instance locale.
-- Compte AdMob (phase 6), compte Vercel (phase 7).
-- Décisions : identifiant d'application définitif, nom commercial, fournisseur de tuiles de
-  production, avis juridique ODbL, URL de politique de confidentialité, licence du code.
+## Tests réellement exécutés (31/10/2026)
 
-## Prochaine étape
+| Vérification                                                       | Résultat                                                     |
+| ------------------------------------------------------------------ | ------------------------------------------------------------ |
+| `npm run check` (Prettier, TypeScript 5 paquets, ESLint, tests)    | ✅                                                           |
+| Jest `apps/mobile`                                                 | ✅ 15 suites, **133 tests**                                  |
+| Vitest `packages/core`                                             | ✅ **32 tests**                                              |
+| Vitest `packages/importers` avec base PostGIS réelle               | ✅ **19 tests** (dont chargement en base)                    |
+| Vitest `apps/admin`                                                | ✅ 3 tests                                                   |
+| pgTAP (PostgreSQL 16 + PostGIS 3 + privilèges par défaut Supabase) | ✅ **70 tests**                                              |
+| Export web, Android (Hermes)                                       | ✅                                                           |
+| `next build` de l'administration                                   | ✅                                                           |
+| Serveur d'administration : redirection vers /login, en-têtes       | ✅ (sans Supabase joignable)                                 |
+| CI GitHub (qualité, base de données, bundles)                      | ✅ sur `dcbe2dc` ; vérifier l'exécution des derniers commits |
 
-1. **Valider la phase 1 sur appareil** : `eas init`, puis
-   `eas build --profile development --platform android` (et iOS), recette de la carte, des
-   permissions et des onglets.
-2. **Phase 2 — backend** : projet Supabase ; migrations PostGIS selon [DATABASE.md](DATABASE.md)
-   (énumérations, tables, contrainte de certification, index GiST, RLS, RPC
-   `water_points_in_bbox` / `nearby`) ; tests SQL des politiques et des requêtes ;
-   implémentation `SupabaseWaterPointRepository` dans `services/water-points/registry.ts` ;
-   session via `expo-secure-store`.
+Nouveaux tests (phases 4 à 7) : analyse de la réponse de géocodage et absence d'envoi de
+position ; blocs publicitaires (test hors production, aucun en production non configurée,
+interstitiels désactivés) ; parcours de consentement (refus → non personnalisé, formulaire
+unique) ; traduction des erreurs d'authentification ; chemin de stockage des photos ; message de
+partage ; formulaire d'ajout (visiteur bloqué, envoi GPS, jamais de certification, doublon avec
+lien, GPS imprécis refusé) ; différences d'une modification ; statuts de contribution ;
+libellés de l'administration ; SQL : file de modération et recherche réservées aux modérateurs,
+fonctions internes non appelables, coordonnées fournies au modérateur.
+
+### Non testé (impossible dans cet environnement)
+
+- **Appels réels aux services publics** : Overpass, data.gouv.fr, opendata.paris.fr,
+  Géoplateforme (géocodage), tuiles OpenFreeMap — hôtes bloqués par la politique réseau.
+  Les connecteurs sont testés avec des réponses simulées au format documenté.
+- **Supabase complet** (authentification, PostgREST, stockage) : Docker indisponible ici ; la base
+  est testée en SQL et l'application avec des réponses enregistrées depuis cette base.
+- **Appareils** : rendu natif, GPS réel, caméra, UMP/ATT, AdMob, compilation Gradle/Xcode.
+- Parcours connecté de l'administration.
+
+→ Tout cela est couvert par la recette de [LOCAL_TESTING.md](LOCAL_TESTING.md).
+
+## Revue de sécurité (phase 8)
+
+- ✅ Corrigé : sur Supabase, `authenticated` gardait l'exécution des fonctions internes
+  (`notify_user`, `log_moderation`) ; révocation ajoutée et tests qui reproduisent les privilèges
+  par défaut de Supabase (ils échouent sans le correctif).
+- ✅ Aucune clé `service_role` dans les applications ; aucun secret versionné (recherche de motifs).
+- ✅ Authentification Supabase : confirmation d'e-mail, mot de passe ≥ 8, changement de mot de
+  passe sécurisé, URL de redirection limitées aux schémas de l'application.
+- ✅ Photos : compartiment privé, dossier par utilisateur, JPEG/WebP ≤ 6 Mio, chemin validé en
+  SQL, EXIF supprimé côté application.
+- ⚠️ `npm audit` : 30 alertes, toutes dans l'outillage (Expo CLI, Jest) ; le correctif proposé
+  rétrograderait Expo à 54 → non appliqué, à suivre avec les mises à jour du SDK.
+
+## Bugs et limites connus
+
+| #   | Description                                                                                           | Gravité                  |
+| --- | ----------------------------------------------------------------------------------------------------- | ------------------------ |
+| 1   | Connecteurs jamais exécutés sur les vraies API (formats réels à confirmer)                            | Haute (recette locale)   |
+| 2   | Licences des sources (ODbL OSM, jeu Paris) et conditions OpenFreeMap à valider                        | Haute (avant production) |
+| 3   | Aucun test sur appareil (carte native, publicités, caméra)                                            | Haute (avant bêta)       |
+| 4   | Notifications uniquement dans l'application (pas de push)                                             | Moyenne                  |
+| 5   | Placement d'un nouveau point par le centre de la carte (pas de repère déplaçable)                     | Faible                   |
+| 6   | Panneau d'aperçu non glissable au doigt                                                               | Faible                   |
+| 7   | Traduction anglaise non relue par un natif                                                            | Moyenne                  |
+| 8   | Pas de limitation de fréquence sur la recherche d'adresses côté application (temporisation seulement) | Faible                   |
+
+## Ce qui nécessite votre intervention
+
+1. **Recette locale** selon [LOCAL_TESTING.md](LOCAL_TESTING.md) (Docker + Supabase local + imports réels).
+2. **Comptes** : Supabase (projet en ligne), Expo/EAS, Apple Developer (payant), Google Play
+   Console (payant), AdMob (identifiants d'application et de blocs), Vercel.
+3. **Décisions** : identifiant d'application définitif, fournisseur de tuiles de production,
+   avis juridique ODbL, politique de confidentialité publiée, adresse de contact sécurité.
+4. **Secrets CI** : `SUPABASE_DB_URL` dans GitHub pour activer les imports hebdomadaires.
 
 ## Reprendre le travail (nouvelle session)
 
@@ -179,18 +157,8 @@ git clone https://github.com/MustaphaAitHamou/Project_Aman.git
 ```
 
 ```bash
-cd Project_Aman
+cd Project_Aman && npm install && npm run check
 ```
 
-```bash
-npm install
-```
-
-```bash
-npm run check
-```
-
-Lire [CLAUDE.md](CLAUDE.md) et [ARCHITECTURE.md](ARCHITECTURE.md). Points d'entrée :
-`apps/mobile/src/app/_layout.tsx` (navigation), `apps/mobile/src/features/map/MapScreen.tsx`
-(carte), `apps/mobile/src/services/water-points/registry.ts` (branchement du backend),
-`packages/core/src/index.ts` (domaine).
+Lire [CLAUDE.md](CLAUDE.md), [ARCHITECTURE.md](ARCHITECTURE.md) puis ce fichier. Tests SQL
+locaux : `npm run db:test` (PostgreSQL 16 + PostGIS + pgTAP, variables `PGHOST`/`PGPORT`/`PGUSER`).

@@ -155,6 +155,25 @@ phase 2 (`services/water-points/registry.ts`).
 (development / staging / production), bloque les permissions inutiles, refuse le mode démo en
 production et refuse un `APP_ENV` invalide. Voir [DEPLOYMENT.md](DEPLOYMENT.md).
 
+## Phases 2 à 7 : modules ajoutés
+
+| Module                                  | Rôle                                                                                                                         |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `supabase/migrations`                   | Schéma PostGIS, RLS, API SQL (lecture, contributions, modération, imports, administration) — voir [DATABASE.md](DATABASE.md) |
+| `packages/importers`                    | ETL : connecteurs → transformation défensive → `etl_upsert_point` (idempotent) ; CLI `npm run etl`                           |
+| `apps/mobile/src/services/supabase`     | Client unique (clé publique), session dans `expo-secure-store`, traduction des erreurs SQL                                   |
+| `apps/mobile/src/services/water-points` | `SupabaseWaterPointRepository` (emprise, voisins, fiche) derrière l'interface de `packages/core`                             |
+| `apps/mobile/src/services/auth`         | Store de session (Zustand) synchronisé avec Supabase Auth ; inscription, connexion, suppression                              |
+| `apps/mobile/src/services/community`    | Appels de contribution (fonctions SQL), favoris, notifications, photos ; hooks TanStack Query                                |
+| `apps/mobile/src/services/geocoding`    | Géoplateforme IGN, temporisation, analyse défensive                                                                          |
+| `apps/mobile/src/services/ads`          | Consentement UMP → ATT → initialisation AdMob ; blocs de test hors production ; variantes `.web.ts` sans publicité           |
+| `apps/mobile/src/features/ads`          | Bannière et annonce native signalées « Publicité »                                                                           |
+| `apps/admin`                            | Next.js 16 (App Router, Server Actions, `proxy.ts`) avec `@supabase/ssr` ; aucune clé `service_role`                         |
+
+Principe commun : **toute écriture passe par une fonction SQL** qui vérifie l'identité, le rôle,
+les quotas et les règles métier ; les clients (application, administration) n'ont que la clé
+publique.
+
 ## Décisions techniques
 
 | #   | Décision                                      | Justification                                                                                                                                                      |
