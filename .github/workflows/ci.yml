@@ -48,13 +48,14 @@ jobs:
         run: |
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get install -y -q postgresql-17 postgresql-17-postgis-3 postgresql-17-pgtap
-          sudo systemctl stop postgresql@16-main || true
-          sudo pg_dropcluster 16 main || true
-          sudo pg_lsclusters
-          sudo sed -i 's/^port = .*/port = 5432/' /etc/postgresql/17/main/postgresql.conf
+          # L'image du runner ne crée pas de cluster automatiquement : création explicite.
+          for c in $(pg_lsclusters -h | awk '{print $1"/"$2}'); do
+            sudo pg_dropcluster --stop "${c%/*}" "${c#*/}"
+          done
+          sudo pg_createcluster 17 main --port 5432
           # Base jetable de CI : authentification « trust » (seule la méthode est remplacée).
           sudo sed -i -E 's/(peer|md5|scram-sha-256)[[:space:]]*$/trust/' /etc/postgresql/17/main/pg_hba.conf
-          sudo systemctl restart postgresql@17-main
+          sudo pg_ctlcluster 17 main start
           pg_lsclusters
           for i in $(seq 1 30); do pg_isready -h localhost -p 5432 && break; sleep 1; done
       - name: Migrations et tests pgTAP
