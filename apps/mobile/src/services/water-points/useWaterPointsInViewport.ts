@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import {
   bboxCacheKey,
   expandBBox,
@@ -53,6 +54,11 @@ export function useWaterPointsInViewport(
     placeholderData: keepPreviousData,
     staleTime: 5 * 60_000,
   });
+
+  // En développement, la cause exacte (réseau, clé, fonction SQL…) est affichée dans la console.
+  useEffect(() => {
+    if (__DEV__ && query.error) console.warn('[Water Finder] Chargement des points :', query.error);
+  }, [query.error]);
 
   if (!repository) return { status: 'no_source' };
   if (!zoomOk) return { status: 'zoom_in' };
