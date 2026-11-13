@@ -35,6 +35,10 @@ npm run check
 
 ## 1. Démarrer Supabase local
 
+La version de la CLI Supabase est fixée par le projet (`supabase` 2.122.1 dans `package.json`) :
+`npx supabase` utilise cette version après `npm install`, et non la dernière publiée, dont le
+format de configuration peut changer.
+
 Docker Desktop doit être lancé.
 
 ```bash
