@@ -46,7 +46,7 @@ export function Chip({
         {
           gap: theme.space.xs,
           paddingHorizontal: theme.space.md,
-          borderRadius: theme.radius.pill,
+          ...theme.shape.chip,
           backgroundColor: selected ? colors.primarySoft : colors.surfaceElevated,
           borderColor: selected ? colors.primary : colors.border,
           boxShadow: theme.shadow.sm,

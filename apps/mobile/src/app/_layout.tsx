@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useFonts } from 'expo-font';
 import { Stack, type ErrorBoundaryProps } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useState } from 'react';
@@ -15,7 +16,7 @@ import { useAuthListener } from '@/services/auth/session';
 import { usePreferencesHydrated, usePreferencesStore } from '@/stores/preferences';
 import { AppThemeProvider, useAppTheme } from '@/theme';
 
-// L'écran de lancement reste affiché jusqu'au chargement des préférences locales.
+// L'écran de lancement reste affiché jusqu'au chargement des préférences locales et des polices.
 SplashScreen.preventAutoHideAsync().catch(() => undefined);
 SplashScreen.setOptions({ duration: 300, fade: true });
 
@@ -49,12 +50,20 @@ function RootNavigator() {
   const theme = useAppTheme();
   const hydrated = usePreferencesHydrated();
   const hasCompletedOnboarding = usePreferencesStore((state) => state.hasCompletedOnboarding);
+  // M PLUS Rounded 1c, la police de la DA. En cas d'échec, l'application continue avec la police système.
+  const [fontsLoaded, fontError] = useFonts({
+    'MPLUSRounded1c-Regular': require('../../assets/fonts/MPLUSRounded1c-Regular.ttf') as number,
+    'MPLUSRounded1c-Bold': require('../../assets/fonts/MPLUSRounded1c-Bold.ttf') as number,
+    'MPLUSRounded1c-ExtraBold':
+      require('../../assets/fonts/MPLUSRounded1c-ExtraBold.ttf') as number,
+  });
+  const ready = hydrated && (fontsLoaded || fontError !== null);
   useLanguageSync();
   useAuthListener();
 
   useEffect(() => {
-    if (hydrated) SplashScreen.hideAsync().catch(() => undefined);
-  }, [hydrated]);
+    if (ready) SplashScreen.hideAsync().catch(() => undefined);
+  }, [ready]);
 
   // Consentement publicitaire demandé après la présentation, jamais au premier écran,
   // et en tâche de fond : la carte reste utilisable pendant ce temps.
@@ -62,7 +71,7 @@ function RootNavigator() {
     if (hydrated && hasCompletedOnboarding) void initializeAds();
   }, [hydrated, hasCompletedOnboarding]);
 
-  if (!hydrated) return null;
+  if (!ready) return null;
 
   return (
     <Stack

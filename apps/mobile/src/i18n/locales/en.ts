@@ -271,6 +271,7 @@ export const en: Translations = {
     deleteBody: 'This action is permanent and cannot be undone.',
     deleteConfirm: 'Delete',
     version: 'Version {{version}} · {{env}}',
+    publisher: 'An app by Tamurt Services',
   },
   settings: {
     title: 'Settings',

@@ -3,6 +3,39 @@
  * ils passent par le thème sémantique (`useAppTheme`) pour supporter le mode sombre.
  */
 export const palette = {
+  /** Bleu source de la DA Tamurt Services (Water Finder). */
+  source: {
+    soft: '#E2F4F9',
+    text: '#0A6B88',
+    main: '#0B7797',
+    pressed: '#0A6C89',
+    vif: '#0E9BC0',
+    deep: '#0A4F7A',
+    darkMain: '#5FCBE6',
+    darkPressed: '#57B9D1',
+    darkText: '#72D2EA',
+    darkSoft: '#0A2C38',
+    darkOn: '#04252F',
+  },
+  /** Neutres chauds communs à la famille Tamurt Services. */
+  sand: {
+    surface: '#F6F5F2',
+    raised: '#FFFFFF',
+    sunken: '#EBE9E4',
+    line: '#DEDBD4',
+    lineStrong: '#8A857C',
+    ink: '#1D1B19',
+    inkSecondary: '#45413C',
+    inkMuted: '#5C5852',
+    darkSurface: '#141312',
+    darkRaised: '#1F1D1B',
+    darkSunken: '#2A2724',
+    darkLine: '#35322E',
+    darkLineStrong: '#8A847B',
+    darkInk: '#F4F1EC',
+    darkInkSecondary: '#D2CCC3',
+    darkInkMuted: '#B5AFA6',
+  },
   water: {
     50: '#EEF8FF',
     100: '#E3F2FF',
@@ -75,6 +108,27 @@ export const radius = {
   pill: 999,
 } as const;
 
+/**
+ * Formes « goutte » de la DA : deux coins arrondis en diagonale, deux coins vifs.
+ * Coins physiques (l'application n'a que des langues de gauche à droite).
+ */
+function drop(round: number, sharp: number) {
+  return {
+    borderTopLeftRadius: round,
+    borderTopRightRadius: sharp,
+    borderBottomRightRadius: round,
+    borderBottomLeftRadius: sharp,
+  } as const;
+}
+
+export const shape = {
+  button: drop(24, 4),
+  buttonSmall: drop(20, 4),
+  card: drop(26, 6),
+  field: drop(16, 4),
+  chip: drop(16, 4),
+} as const;
+
 /** Taille minimale d'une cible tactile (recommandations Android 48 dp / iOS 44 pt). */
 export const MIN_TOUCH_TARGET = 48;
 
@@ -87,9 +141,9 @@ export const duration = {
 /** Ombres portées multiplateformes (propriété `boxShadow`, New Architecture et web). */
 export const shadow = {
   light: {
-    sm: '0px 1px 3px rgba(15, 26, 42, 0.12)',
-    md: '0px 4px 14px rgba(15, 26, 42, 0.14)',
-    lg: '0px 12px 32px rgba(15, 26, 42, 0.20)',
+    sm: '0px 1px 3px rgba(29, 27, 25, 0.12)',
+    md: '0px 4px 14px rgba(29, 27, 25, 0.14)',
+    lg: '0px 12px 32px rgba(29, 27, 25, 0.20)',
   },
   dark: {
     sm: '0px 1px 3px rgba(0, 0, 0, 0.45)',

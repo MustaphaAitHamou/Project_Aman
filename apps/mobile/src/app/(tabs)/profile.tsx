@@ -224,6 +224,9 @@ export default function ProfileTab() {
       ) : null}
 
       <AppText variant="footnote" tone="muted" align="center">
+        {t('profile.publisher')}
+      </AppText>
+      <AppText variant="footnote" tone="muted" align="center">
         {t('profile.version', { version: env.appVersion, env: env.appEnv })}
       </AppText>
     </Screen>

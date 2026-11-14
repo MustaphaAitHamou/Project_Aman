@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
@@ -12,7 +13,26 @@ export default async function StaffLayout({ children }: { children: ReactNode })
   return (
     <div className="shell">
       <nav className="nav" aria-label="Navigation principale">
-        <div className="brand">Water Finder</div>
+        <div className="brand">
+          <Image
+            className="logo-clair"
+            src="/brand/wordmark.svg"
+            alt="Water Finder"
+            width={145}
+            height={22}
+            unoptimized
+            priority
+          />
+          <Image
+            className="logo-sombre"
+            src="/brand/wordmark-sombre.svg"
+            alt="Water Finder"
+            width={145}
+            height={22}
+            unoptimized
+          />
+          <span className="muted">Administration · par Tamurt Services</span>
+        </div>
         <Link href="/">Tableau de bord</Link>
         <Link href="/moderation">Modération</Link>
         <Link href="/duplicates">Doublons</Link>

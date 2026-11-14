@@ -1,7 +1,7 @@
 import { Children, Fragment, type ReactNode } from 'react';
 import { StyleSheet, View } from 'react-native';
 
-import { useAppTheme } from '@/theme';
+import { fontFamily, useAppTheme } from '@/theme';
 
 import { AppText } from './AppText';
 
@@ -31,7 +31,7 @@ export function Section({ title, footer, children }: SectionProps) {
       <View
         style={{
           backgroundColor: theme.colors.surface,
-          borderRadius: theme.radius.lg,
+          ...theme.shape.card,
           borderWidth: 1,
           borderColor: theme.colors.border,
           overflow: 'hidden',
@@ -62,7 +62,7 @@ export function Section({ title, footer, children }: SectionProps) {
 
 const styles = StyleSheet.create({
   title: {
-    fontWeight: '600',
+    fontFamily: fontFamily.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
   },

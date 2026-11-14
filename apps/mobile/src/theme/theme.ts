@@ -1,5 +1,5 @@
 import { darkColors, lightColors, type ColorScheme, type ThemeColors } from './colors';
-import { duration, MIN_TOUCH_TARGET, radius, shadow, space } from './tokens';
+import { duration, MIN_TOUCH_TARGET, radius, shadow, shape, space } from './tokens';
 import { typography } from './typography';
 
 export interface AppTheme {
@@ -7,6 +7,7 @@ export interface AppTheme {
   colors: ThemeColors;
   space: typeof space;
   radius: typeof radius;
+  shape: typeof shape;
   typography: typeof typography;
   shadow: (typeof shadow)[ColorScheme];
   duration: typeof duration;
@@ -19,6 +20,7 @@ function createTheme(scheme: ColorScheme): AppTheme {
     colors: scheme === 'dark' ? darkColors : lightColors,
     space,
     radius,
+    shape,
     typography,
     shadow: shadow[scheme],
     duration,

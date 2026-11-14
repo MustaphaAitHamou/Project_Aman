@@ -86,7 +86,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     adaptiveIcon: {
       foregroundImage: './assets/images/adaptive-icon-foreground.png',
       monochromeImage: './assets/images/adaptive-icon-monochrome.png',
-      backgroundColor: '#0075C4',
+      backgroundColor: '#0B7797',
     },
     predictiveBackGestureEnabled: false,
     // Minimisation : aucune localisation en arrière-plan en V1, aucun accès au stockage partagé.
@@ -113,11 +113,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     [
       'expo-splash-screen',
       {
-        backgroundColor: '#0075C4',
+        backgroundColor: '#0B7797',
         image: './assets/images/splash-icon.png',
         imageWidth: 160,
         dark: {
-          backgroundColor: '#0B1220',
+          backgroundColor: '#141312',
           image: './assets/images/splash-icon.png',
         },
       },

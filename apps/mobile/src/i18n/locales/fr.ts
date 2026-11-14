@@ -275,6 +275,7 @@ export const fr = {
     deleteBody: 'Cette action est définitive et ne peut pas être annulée.',
     deleteConfirm: 'Supprimer',
     version: 'Version {{version}} · {{env}}',
+    publisher: 'Une application de Tamurt Services',
   },
   settings: {
     title: 'Paramètres',

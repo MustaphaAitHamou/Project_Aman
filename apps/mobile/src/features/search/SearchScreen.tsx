@@ -16,7 +16,7 @@ import { useAddressSearch } from '@/services/geocoding/useAddressSearch';
 import { SearchField } from '@/components/ui/SearchField';
 import { USER_ZOOM } from '@/features/map/map-config';
 import { useMapCameraStore } from '@/stores/map-camera';
-import { useAppTheme } from '@/theme';
+import { fontFamily, useAppTheme } from '@/theme';
 
 import { deviceRegion } from '@/lib/region';
 
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     marginLeft: 68,
   },
   sectionTitle: {
-    fontWeight: '600',
+    fontFamily: fontFamily.bold,
     textTransform: 'uppercase',
     letterSpacing: 0.6,
     marginTop: 8,

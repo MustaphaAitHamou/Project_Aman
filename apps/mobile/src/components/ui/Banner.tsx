@@ -45,7 +45,7 @@ export function Banner({
         styles.base,
         {
           backgroundColor: palette.soft,
-          borderRadius: theme.radius.md,
+          ...theme.shape.field,
           paddingHorizontal: theme.space.md,
           gap: theme.space.sm,
           boxShadow: theme.shadow.sm,

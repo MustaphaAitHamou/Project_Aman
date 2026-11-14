@@ -1,6 +1,6 @@
 import { StyleSheet, View } from 'react-native';
 
-import { MAX_FONT_SCALE_COMPACT, useAppTheme } from '@/theme';
+import { fontFamily, MAX_FONT_SCALE_COMPACT, useAppTheme } from '@/theme';
 
 import { AppText } from './AppText';
 import { Icon, type IconName } from './Icon';
@@ -25,7 +25,7 @@ export function StatusBadge({ tone, label, icon, testID }: StatusBadgeProps) {
         styles.base,
         {
           backgroundColor: palette.soft,
-          borderRadius: theme.radius.pill,
+          ...theme.shape.chip,
           paddingHorizontal: theme.space.sm,
           gap: theme.space.xs,
         },
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   label: {
-    fontWeight: '600',
+    fontFamily: fontFamily.bold,
     flexShrink: 1,
   },
 });

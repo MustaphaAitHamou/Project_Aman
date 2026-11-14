@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, StatusBadge } from '@/components/ui';
-import { useAppTheme } from '@/theme';
+import { fontFamily, useAppTheme } from '@/theme';
 
 import {
   AVAILABILITY_PRESENTATION,
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   },
   label: {
     width: 104,
-    fontWeight: '600',
+    fontFamily: fontFamily.bold,
   },
   value: {
     flex: 1,

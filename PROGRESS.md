@@ -1,7 +1,7 @@
 # Avancement — Water Finder
 
-_Dernière mise à jour : 31/10/2026 — phases 1 à 7 développées, phase 8 en cours (recette locale
-par le porteur du projet)._
+_Dernière mise à jour : 14/11/2026 — phases 1 à 7 développées, phase 8 en cours (recette locale
+par le porteur du projet) ; identité visuelle de la DA Tamurt Services appliquée._
 
 ## Résumé
 
@@ -151,6 +151,17 @@ Pays ajoutés : **Algérie (prioritaire)**, Belgique, Suisse, Espagne, Italie, C
   SQL, EXIF supprimé côté application.
 - ⚠️ `npm audit` : 30 alertes, toutes dans l'outillage (Expo CLI, Jest) ; le correctif proposé
   rétrograderait Expo à 54 → non appliqué, à suivre avec les mises à jour du SDK.
+
+## Identité visuelle (DA Tamurt Services, 14/11/2026)
+
+Water Finder est une application autonome de Tamurt Services. Elle ne porte ni signe amazigh ni bouton yaz, seulement la mention « Une application de Tamurt Services » dans le profil.
+
+- **Couleurs** : bleu source (`#0B7797`, `#5FCBE6` en sombre) sur les neutres chauds de la famille. Les statuts reprennent la DA, les marqueurs de carte restent à ≥ 3:1. Tests de contraste à jour et passants.
+- **Police** : M PLUS Rounded 1c, sous-ensemble latin embarqué (`apps/mobile/assets/fonts`, licence OFL jointe) et chargé au démarrage ; `next/font` pour l'administration.
+- **Formes « goutte »** : deux coins arrondis en diagonale, deux coins vifs (`shape` dans `src/theme/tokens.ts`). Elles s'appliquent aux boutons, cartes, champs, puces et bandeaux, mobile et administration.
+- **Icônes** : icône, premier plan adaptatif Android et favicon refaits depuis le kit. La silhouette monochrome et l'image de lancement (la même goutte) sont conservées.
+- **Vérifié** : `npm run check` (formatage, types, lint, tests). Aperçu web contrôlé en clair et en sombre.
+- **Non vérifié** : le rendu sur appareil (iOS et Android), et la carte elle-même dans l'aperçu web, où le worker MapLibre n'était pas copié et le fond de carte hors réseau.
 
 ## Bugs et limites connus
 

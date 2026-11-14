@@ -90,7 +90,7 @@ export function Button({
           {
             minHeight: size === 'lg' ? 56 : theme.minTouchTarget,
             paddingHorizontal: size === 'lg' ? theme.space['2xl'] : theme.space.xl,
-            borderRadius: theme.radius.md,
+            ...(size === 'lg' ? theme.shape.button : theme.shape.buttonSmall),
             backgroundColor: palette.background,
             borderColor: palette.border,
             opacity: inactive ? 0.55 : 1,

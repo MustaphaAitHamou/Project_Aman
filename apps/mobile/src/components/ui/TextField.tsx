@@ -1,6 +1,6 @@
 import { StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
 
-import { useAppTheme } from '@/theme';
+import { fontFamily, useAppTheme } from '@/theme';
 
 import { AppText } from './AppText';
 
@@ -36,7 +36,7 @@ export function TextField({ label, hint, error, multiline, ...rest }: TextFieldP
             color: colors.text,
             backgroundColor: colors.surfaceMuted,
             borderColor: error ? colors.danger : colors.borderStrong,
-            borderRadius: theme.radius.md,
+            ...theme.shape.field,
             paddingHorizontal: theme.space.md,
           },
           multiline && styles.multiline,
@@ -57,7 +57,7 @@ export function TextField({ label, hint, error, multiline, ...rest }: TextFieldP
 
 const styles = StyleSheet.create({
   label: {
-    fontWeight: '600',
+    fontFamily: fontFamily.bold,
   },
   input: {
     minHeight: 48,

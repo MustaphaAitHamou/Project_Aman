@@ -1,16 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#22A7F5"/>
-      <stop offset="1" stop-color="#005A9C"/>
-    </linearGradient>
-    <mask id="hole">
-      <rect width="1024" height="1024" fill="#fff"/>
-      <circle cx="512" cy="592" r="86" fill="#000"/>
-    </mask>
-  </defs>
-  <rect width="1024" height="1024" fill="url(#bg)"/>
-  <path d="M0 800 C170 740 340 860 512 800 C684 740 854 860 1024 800 L1024 1024 L0 1024 Z" fill="#ffffff" opacity="0.10"/>
-  <path d="M0 880 C170 820 340 940 512 880 C684 820 854 940 1024 880 L1024 1024 L0 1024 Z" fill="#ffffff" opacity="0.10"/>
-  <path d="M512 196 C440 300 292 450 292 604 A220 220 0 0 0 732 604 C732 450 584 300 512 196 Z" fill="#ffffff" mask="url(#hole)"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="Water Finder"><title>Water Finder</title><defs><linearGradient id="g-water" gradientUnits="objectBoundingBox" x1="0.08" y1="0.77" x2="0.92" y2="0.23"><stop offset="0%" stop-color="#0a4f7a"/><stop offset="42%" stop-color="#0b7797"/><stop offset="100%" stop-color="#0e9bc0"/></linearGradient></defs><rect width="1024" height="1024" rx="0" fill="url(#g-water)"/><clipPath id="c-water"><rect width="1024" height="1024" rx="0"/></clipPath><path clip-path="url(#c-water)" fill="#ffffff" d="M721.5 650.6C721.5 768.1 626.3 860.2 512 860.2C397.7 860.2 302.5 768.1 302.5 650.6C302.5 447.5 505.7 345.9 524.7 193.5C543.7 345.9 721.5 447.5 721.5 650.6ZM442.2 657C442.2 695.5 473.5 726.8 512 726.8C550.5 726.8 581.8 695.5 581.8 657C581.8 618.5 550.5 587.2 512 587.2C473.5 587.2 442.2 618.5 442.2 657Z"/></svg>

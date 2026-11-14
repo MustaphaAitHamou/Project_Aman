@@ -28,7 +28,7 @@ export function SearchField({
         {
           gap: theme.space.sm,
           paddingHorizontal: theme.space.md,
-          borderRadius: theme.radius.md,
+          ...theme.shape.field,
           backgroundColor: colors.surfaceMuted,
           borderColor: colors.borderStrong,
         },

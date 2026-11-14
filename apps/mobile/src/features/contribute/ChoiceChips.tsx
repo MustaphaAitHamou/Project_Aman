@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
 
 import { AppText, Chip, type IconName } from '@/components/ui';
-import { useAppTheme } from '@/theme';
+import { fontFamily, useAppTheme } from '@/theme';
 
 export interface Choice<T> {
   value: T;
@@ -47,7 +47,7 @@ export function ChoiceChips<T extends string | boolean | null>({
 
 const styles = StyleSheet.create({
   label: {
-    fontWeight: '600',
+    fontFamily: fontFamily.bold,
   },
   row: {
     flexDirection: 'row',

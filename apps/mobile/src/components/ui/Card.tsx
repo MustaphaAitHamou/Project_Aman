@@ -15,7 +15,7 @@ export function Card({ elevated = false, padded = true, style, ...rest }: CardPr
       style={[
         {
           backgroundColor: elevated ? theme.colors.surfaceElevated : theme.colors.surface,
-          borderRadius: theme.radius.lg,
+          ...theme.shape.card,
           borderWidth: elevated ? 0 : 1,
           borderColor: theme.colors.border,
           padding: padded ? theme.space.lg : 0,

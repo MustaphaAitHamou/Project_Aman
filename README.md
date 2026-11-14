@@ -35,6 +35,10 @@ l'environnement de développement n'avait pas accès aux tuiles._
 - Aucune donnée fictive ne remplace silencieusement des données réelles.
 - Aucun secret dans le dépôt ni dans l'application.
 
+## Identité visuelle
+
+Une application de **Tamurt Services**, avec sa propre identité : le bleu source (`#0B7797`), la police ronde M PLUS Rounded 1c et des formes « goutte » (deux coins arrondis en diagonale, deux coins vifs). Elle ne porte pas les signes de la famille Tamurt : c'est une app autonome. Détails dans [PROGRESS.md](PROGRESS.md).
+
 ## Démarrage rapide
 
 ```bash
