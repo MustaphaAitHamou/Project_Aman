@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
+import { Drop } from '@/components/brand';
 import {
   AppText,
   Banner,
@@ -82,9 +83,9 @@ export default function ProfileTab() {
     <Screen title={t('profile.title')} testID="profile-screen">
       <Card style={{ gap: theme.space.md }}>
         <View style={[styles.guest, { gap: theme.space.md }]}>
-          <View style={[styles.avatar, { backgroundColor: theme.colors.primarySoft }]}>
-            <Icon name="account-circle-outline" size={36} color={theme.colors.onPrimarySoft} />
-          </View>
+          <Drop size={56} color={theme.colors.primarySoft} highlight={false}>
+            <Icon name="account-circle-outline" size={30} color={theme.colors.onPrimarySoft} />
+          </Drop>
           <View style={styles.guestText}>
             <AppText variant="headline" testID="profile-name">
               {signedIn ? (profile?.displayName ?? t('profile.noDisplayName')) : t('profile.guest')}
@@ -237,13 +238,6 @@ const styles = StyleSheet.create({
   guest: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  avatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   guestText: {
     flex: 1,

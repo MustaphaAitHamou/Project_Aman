@@ -1,5 +1,7 @@
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import Animated, { interpolate, useAnimatedStyle } from 'react-native-reanimated';
 
+import { Drop, DropMascot, gentle, Ripples, useLoop } from '@/components/brand';
 import { useAppTheme } from '@/theme';
 
 import { AppText } from './AppText';
@@ -14,7 +16,28 @@ export interface EmptyStateProps {
   tone?: StatusTone;
   action?: Pick<ButtonProps, 'label' | 'onPress' | 'icon' | 'variant'>;
   secondaryAction?: Pick<ButtonProps, 'label' | 'onPress' | 'icon'>;
+  /** Mascotte animée (états vides « normaux ») plutôt qu'une simple goutte. */
+  mascot?: boolean;
   testID?: string;
+}
+
+/** Pastille ronde d'icône, posée contre la mascotte. */
+function IconBadge({
+  icon,
+  background,
+  color,
+  border,
+}: {
+  icon: IconName;
+  background: string;
+  color: string;
+  border: string;
+}) {
+  return (
+    <View style={[styles.badge, { backgroundColor: background, borderColor: border }]}>
+      <Icon name={icon} size={20} color={color} />
+    </View>
+  );
 }
 
 /** État vide, erreur ou fonctionnalité à venir : toujours une explication et, si possible, une action. */
@@ -25,6 +48,7 @@ export function EmptyState({
   tone = 'info',
   action,
   secondaryAction,
+  mascot = false,
   testID,
 }: EmptyStateProps) {
   const theme = useAppTheme();
@@ -35,9 +59,27 @@ export function EmptyState({
       testID={testID}
       style={[styles.container, { gap: theme.space.md, padding: theme.space['2xl'] }]}
     >
-      <View style={[styles.iconCircle, { backgroundColor: palette.soft }]}>
-        <Icon name={icon} size={36} color={palette.onSoft} />
-      </View>
+      {mascot ? (
+        <DropMascot
+          size={84}
+          ripplesColor={theme.colors.primary}
+          accessory={
+            <IconBadge
+              icon={icon}
+              background={palette.soft}
+              color={palette.onSoft}
+              border={theme.colors.background}
+            />
+          }
+        />
+      ) : (
+        <View style={styles.dropStage}>
+          <Ripples size={132} color={palette.base} count={2} duration={3000} />
+          <Drop size={64} color={palette.soft} style={styles.dropOnStage}>
+            <Icon name={icon} size={28} color={palette.onSoft} />
+          </Drop>
+        </View>
+      )}
       <AppText variant="title3" align="center" accessibilityRole="header">
         {title}
       </AppText>
@@ -56,6 +98,30 @@ export function EmptyState({
   );
 }
 
+/** Goutte qui rebondit au-dessus de ses ondes : indicateur de chargement de la marque. */
+function DropLoader() {
+  const theme = useAppTheme();
+  const bounce = useLoop(520, { reverse: true, easing: gentle });
+  const style = useAnimatedStyle(() => ({
+    transform: [{ translateY: interpolate(bounce.value, [0, 1], [0, -14]) }],
+  }));
+  return (
+    <View style={styles.loaderStage}>
+      <Ripples
+        size={96}
+        color={theme.colors.primary}
+        count={2}
+        duration={1040}
+        flatten={0.3}
+        style={styles.loaderRipples}
+      />
+      <Animated.View style={style}>
+        <Drop size={34} color={theme.colors.primary} />
+      </Animated.View>
+    </View>
+  );
+}
+
 export function LoadingState({ label }: { label: string }) {
   const theme = useAppTheme();
   return (
@@ -65,7 +131,7 @@ export function LoadingState({ label }: { label: string }) {
       accessibilityRole="progressbar"
       accessibilityLabel={label}
     >
-      <ActivityIndicator size="large" color={theme.colors.primary} />
+      <DropLoader />
       <AppText variant="callout" tone="secondary" align="center">
         {label}
       </AppText>
@@ -78,12 +144,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  iconCircle: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
+  dropStage: {
+    width: 132,
+    height: 132,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  dropOnStage: {
+    position: 'absolute',
+    top: 22,
+  },
+  badge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  loaderStage: {
+    width: 96,
+    height: 72,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 18,
+  },
+  loaderRipples: {
+    position: 'absolute',
+    bottom: -38,
   },
   body: {
     maxWidth: 420,

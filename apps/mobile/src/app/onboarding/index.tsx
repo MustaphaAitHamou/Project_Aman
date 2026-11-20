@@ -5,7 +5,8 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, FadeOut, ReduceMotion } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppText, Button, Icon, type IconName } from '@/components/ui';
+import { MascotStage } from '@/components/brand';
+import { AppText, Button, type IconName } from '@/components/ui';
 import { useAppTheme } from '@/theme';
 
 type SlideKey = 'slide1' | 'slide2' | 'slide3';
@@ -62,11 +63,7 @@ export default function OnboardingScreen() {
         exiting={FadeOut.duration(120).reduceMotion(ReduceMotion.System)}
         style={[styles.slide, { gap: theme.space['2xl'] }]}
       >
-        <View style={[styles.illustration, { backgroundColor: theme.colors.primarySoft }]}>
-          <View style={[styles.illustrationInner, { backgroundColor: theme.colors.primary }]}>
-            <Icon name={slide.icon} size={64} color={theme.colors.onPrimary} />
-          </View>
-        </View>
+        <MascotStage icon={slide.icon} />
         <View style={{ gap: theme.space.md }}>
           <AppText variant="display" align="center" accessibilityRole="header">
             {t(`onboarding.${slide.key}Title`)}
@@ -128,20 +125,6 @@ const styles = StyleSheet.create({
   },
   slide: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  illustration: {
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  illustrationInner: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
     alignItems: 'center',
     justifyContent: 'center',
   },

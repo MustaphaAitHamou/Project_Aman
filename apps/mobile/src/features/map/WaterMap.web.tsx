@@ -24,8 +24,11 @@ import {
   clusterLayer,
   metersToPixelsExpression,
   pointLayer,
+  SELECTED_PULSE_EXTRA,
   selectedFilter,
   selectedLayer,
+  selectedPulseLayer,
+  selectedRadius,
   userAccuracyLayer,
   userDotLayer,
 } from './map-layers';
@@ -104,6 +107,7 @@ export function WaterMap({
       map.addLayer({ ...clusterLayer(colors), source: SOURCE_ID });
       map.addLayer({ ...clusterCountLayer(colors, clusterFont), source: SOURCE_ID });
       map.addLayer({ ...pointLayer(colors), source: SOURCE_ID });
+      map.addLayer({ ...selectedPulseLayer(colors, selectedPointId), source: SOURCE_ID });
       map.addLayer({ ...selectedLayer(colors, selectedPointId), source: SOURCE_ID });
     }
   });
@@ -203,6 +207,38 @@ export function WaterMap({
     const map = mapRef.current;
     if (!map || !styleReadyRef.current || !map.getLayer(LAYER_IDS.selected)) return;
     map.setFilter(LAYER_IDS.selected, selectedFilter(selectedPointId));
+    if (map.getLayer(LAYER_IDS.selectedPulse)) {
+      map.setFilter(LAYER_IDS.selectedPulse, selectedFilter(selectedPointId));
+    }
+  }, [selectedPointId]);
+
+  // Onde qui part du point sélectionné : expansion avec fondu, puis retour instantané.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !selectedPointId) return;
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
+    const id = LAYER_IDS.selectedPulse;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const set = (extra: number, opacity: number, duration: number) => {
+      if (!map.getLayer(id)) return;
+      map.setPaintProperty(id, 'circle-radius-transition', { duration, delay: 0 });
+      map.setPaintProperty(id, 'circle-stroke-opacity-transition', { duration, delay: 0 });
+      map.setPaintProperty(id, 'circle-radius', selectedRadius(extra));
+      map.setPaintProperty(id, 'circle-stroke-opacity', opacity);
+    };
+    const expand = () => {
+      set(SELECTED_PULSE_EXTRA, 0, 1100);
+      timer = setTimeout(reset, 1250);
+    };
+    const reset = () => {
+      set(0, 0.85, 0);
+      timer = setTimeout(expand, 60);
+    };
+    reset();
+    return () => {
+      clearTimeout(timer);
+      set(0, 0, 0);
+    };
   }, [selectedPointId]);
 
   // Conteneur DOM natif : maplibre-gl manipule directement cet élément.

@@ -2,7 +2,9 @@ import type {
   AvailabilityStatus,
   Freshness,
   OperationalStatus,
+  PotabilityEvidence,
   PotabilityStatus,
+  SourceCategory,
   WaterPointKind,
 } from '@water-finder/core';
 
@@ -15,12 +17,13 @@ export interface StatusPresentation {
 }
 
 /**
- * Codes visuels des statuts. Vert : favorable ; orange : incertain ; rouge : problème ;
+ * Codes visuels des statuts. Vert : favorable ; bleu source : eau indiquée potable par une source
+ * (non certifiée, mais rien n'indique de problème) ; orange : incertain ; rouge : problème ;
  * gris : inconnu. Le texte accompagne toujours la couleur.
  */
 export const POTABILITY_PRESENTATION: Record<PotabilityStatus, StatusPresentation> = {
   certified_potable: { tone: 'success', icon: 'water-check' },
-  declared_potable: { tone: 'warning', icon: 'water-alert' },
+  declared_potable: { tone: 'water', icon: 'water' },
   not_potable: { tone: 'error', icon: 'water-off' },
   unknown: { tone: 'neutral', icon: 'help-circle-outline' },
 };
@@ -55,3 +58,27 @@ export const KIND_ICONS: Record<WaterPointKind, IconName> = {
   decorative_fountain: 'fountain',
   other: 'water',
 };
+
+/**
+ * Provenance de l'indication de potabilité (« selon OpenStreetMap »…) : la preuve si elle est
+ * connue (fiche), sinon la source principale du point (carte, listes). `null` si rien n'indique
+ * la potabilité.
+ */
+export function potabilitySourceCategory(point: {
+  potability: PotabilityStatus;
+  potabilityEvidence?: Pick<PotabilityEvidence, 'kind'> | null;
+  primarySourceCategory?: SourceCategory;
+}): SourceCategory | null {
+  if (point.potability === 'unknown') return null;
+  switch (point.potabilityEvidence?.kind) {
+    case 'official_dataset':
+    case 'sanitary_control':
+      return 'official';
+    case 'osm_tag':
+      return 'openstreetmap';
+    case 'community_report':
+      return 'community';
+    default:
+      return point.primarySourceCategory ?? null;
+  }
+}

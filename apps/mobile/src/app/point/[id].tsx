@@ -3,6 +3,7 @@ import { useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Linking, StyleSheet, View } from 'react-native';
 
+import { Drop } from '@/components/brand';
 import {
   AppText,
   Banner,
@@ -20,11 +21,13 @@ import {
 import { AdBanner } from '@/features/ads/AdBanner';
 import { FreshnessAndSource, PointFacts } from '@/features/water-points/components/PointFacts';
 import { PhotoStrip } from '@/features/water-points/components/PhotoStrip';
+import { PointAddress } from '@/features/water-points/components/PointAddress';
 import { WaterPointStatusList } from '@/features/water-points/components/WaterPointStatusList';
 import { KIND_ICONS } from '@/features/water-points/presentation';
 import { sharePoint } from '@/features/water-points/share';
 import { formatRelativeDate } from '@/lib/format';
 import { useSessionStore } from '@/services/auth/session';
+import { usePointAddress } from '@/services/geocoding/usePointAddress';
 import { useIsFavorite, useToggleFavorite } from '@/services/community/hooks';
 import { openDirections } from '@/services/directions';
 import { useWaterPoint } from '@/services/water-points/useWaterPoint';
@@ -42,6 +45,7 @@ export default function PointDetailScreen() {
   const isFavorite = useIsFavorite(id);
   const toggleFavorite = useToggleFavorite();
   const point = query.data;
+  const address = usePointAddress(point ?? null);
 
   useLayoutEffect(() => {
     if (!point) return;
@@ -106,18 +110,19 @@ export default function PointDetailScreen() {
   return (
     <Screen safeTop={false} testID="point-detail">
       <View style={[styles.header, { gap: theme.space.md }]}>
-        <View style={[styles.kindIcon, { backgroundColor: theme.colors.primarySoft }]}>
-          <Icon name={KIND_ICONS[point.kind]} size={30} color={theme.colors.onPrimarySoft} />
-        </View>
+        <Drop size={54} color={theme.colors.primarySoft} highlight={false}>
+          <Icon name={KIND_ICONS[point.kind]} size={28} color={theme.colors.onPrimarySoft} />
+        </Drop>
         <View style={styles.flex}>
           <AppText variant="title2" accessibilityRole="header">
             {point.name ?? kindLabel}
           </AppText>
           <AppText variant="subhead" tone="secondary">
-            {[kindLabel, point.address, point.city].filter(Boolean).join(' · ')}
+            {kindLabel}
           </AppText>
         </View>
       </View>
+      <PointAddress state={address} testID="point-address" />
 
       {point.publicationStatus === 'pending' ? (
         <Banner
@@ -162,12 +167,23 @@ export default function PointDetailScreen() {
               />
             ) : null}
           </>
+        ) : point.potability !== 'unknown' ? (
+          // Sans preuve détaillée (ex. ajout de la communauté) : on cite au moins la source du point.
+          <AppText variant="callout">
+            {t('pointDetail.evidenceFromSource', {
+              source: t(`point.source.${point.primarySourceCategory}`),
+            })}
+          </AppText>
         ) : (
           <AppText variant="callout" tone="secondary">
             {t('pointDetail.noEvidence')}
           </AppText>
         )}
-        {point.potability !== 'certified_potable' ? (
+        {point.potability === 'declared_potable' ? (
+          <AppText variant="footnote" tone="muted">
+            {t('point.declaredNote')}
+          </AppText>
+        ) : point.potability === 'unknown' ? (
           <AppText variant="footnote" tone="muted">
             {t('point.potabilityDisclaimer')}
           </AppText>
@@ -303,12 +319,5 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-  },
-  kindIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

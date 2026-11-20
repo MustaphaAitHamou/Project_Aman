@@ -1,7 +1,8 @@
 # Avancement — Water Finder
 
-_Dernière mise à jour : 14/11/2026 — phases 1 à 7 développées, phase 8 en cours (recette locale
-par le porteur du projet) ; identité visuelle de la DA Tamurt Services appliquée._
+_Dernière mise à jour : 20/11/2026 — phases 1 à 7 développées, phase 8 en cours (recette locale
+par le porteur du projet) ; identité visuelle animée, présentation de la potabilité et adresses
+des points (retours du porteur du projet)._
 
 ## Résumé
 
@@ -162,6 +163,58 @@ Water Finder est une application autonome de Tamurt Services. Elle ne porte ni s
 - **Icônes** : icône, premier plan adaptatif Android et favicon refaits depuis le kit. La silhouette monochrome et l'image de lancement (la même goutte) sont conservées.
 - **Vérifié** : `npm run check` (formatage, types, lint, tests). Aperçu web contrôlé en clair et en sombre.
 - **Non vérifié** : le rendu sur appareil (iOS et Android), et la carte elle-même dans l'aperçu web, où le worker MapLibre n'était pas copié et le fond de carte hors réseau.
+
+## Identité vivante, potabilité et adresses (20/11/2026, retours du porteur du projet)
+
+Retours : « manque cruellement d'identité visuelle, pas animé, pas vivant » ; « tous les points
+indiqués “Indiquée potable, non certifiée”, ça ne met pas en confiance » ; « mettre l'adresse de
+chaque point d'eau ».
+
+- **Identité animée** (`src/components/brand`), en vues React Native et Reanimated, **sans
+  nouvelle dépendance native** (aucun nouveau build de développement nécessaire) :
+  - « Goutte », la mascotte : elle flotte, cligne des yeux et fait des ronds dans l'eau ;
+  - bandeau bleu source des onglets (Recherche, Contribuer, Activité, Profil) avec bulles qui
+    montent, mascotte et vagues qui se fondent dans la page ;
+  - présentation et autorisation de localisation : la mascotte dans un bassin avec bulles ;
+  - états vides en forme de goutte avec ondes ; chargement par une goutte qui rebondit ;
+  - icônes de type de point et avatar en forme de goutte ;
+  - carte web : une onde part du point sélectionné. Sur mobile, le halo reste fixe pour l'instant,
+    car le rendu natif n'a pas pu être contrôlé ici.
+    Toutes les animations s'arrêtent si l'utilisateur a demandé à réduire les mouvements.
+- **Potabilité** :
+  - « Indiquée potable, non certifiée » (orange) devient **« Eau potable »** (bleu source), toujours
+    accompagnée de sa provenance (« selon OpenStreetMap », « selon une source officielle »,
+    « selon la communauté ») ;
+  - « Potable · certifiée » (vert) reste réservé aux preuves officielles datées : `normalizePotability`
+    est inchangé ;
+  - l'avertissement de l'aperçu ne s'affiche plus que pour une potabilité inconnue. La fiche
+    explique, pour « Eau potable », qu'aucun contrôle sanitaire daté n'est publié et qu'un panneau
+    sur place fait foi ;
+  - la légende, les filtres (« Potable » / « Certifiée ») et le texte des contributions sont mis
+    à jour. L'administration garde les libellés précis destinés aux modérateurs.
+- **Adresses** :
+  - l'adresse de la source est affichée en priorité. L'import OpenStreetMap lit désormais les
+    balises `addr:*` ;
+  - sinon, l'adresse la plus proche est affichée comme « Adresse approximative ». Elle vient de la
+    Géoplateforme en France, de Photon ailleurs, et n'est pas affichée au-delà de 250 m ;
+  - seules les coordonnées du point d'eau sont envoyées, jamais la position de l'utilisateur. Ce
+    point est expliqué dans « Confidentialité » et dans [DATA_SOURCES.md](DATA_SOURCES.md) ;
+  - l'aperçu charge la fiche, qui s'ouvre ensuite immédiatement.
+- **Vérifié le 20/11/2026** :
+  - `npm run check` passe : Jest mobile 16 suites, **148 tests** ; core 32 ; importeurs 21 (+3 en
+    base, ignorés sans PostgreSQL) ; administration 3 ;
+  - nouveaux tests : analyse du géocodage inverse, paramètres envoyés, distance maximale, erreur
+    HTTP, provenance de la potabilité, contraste du nouveau ton « eau », validation de la couche
+    d'onde, balises `addr:*` ;
+  - aucun appel réseau réel en test (garde-fou dans `jest.setup.ts`) ;
+  - bundle Android (Hermes) exporté ;
+  - aperçu web contrôlé en clair et en sombre, à 390 px, avec les données de démonstration et un
+    fond de carte local temporaire (OpenFreeMap est bloqué ici).
+- **Non vérifié** :
+  - le rendu natif sur appareil ;
+  - les réponses réelles de la Géoplateforme et de Photon en géocodage inverse (hôtes bloqués ici,
+    testé sur des réponses simulées au format documenté) ;
+  - l'affichage avec le vrai fond de carte.
 
 ## Bugs et limites connus
 

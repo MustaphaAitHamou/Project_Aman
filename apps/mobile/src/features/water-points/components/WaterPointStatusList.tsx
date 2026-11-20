@@ -1,4 +1,4 @@
-import type { WaterPointSummary } from '@water-finder/core';
+import type { PotabilityEvidence, WaterPointSummary } from '@water-finder/core';
 import { useTranslation } from 'react-i18next';
 import { StyleSheet, View } from 'react-native';
 
@@ -9,6 +9,8 @@ import {
   AVAILABILITY_PRESENTATION,
   OPERATIONAL_PRESENTATION,
   POTABILITY_PRESENTATION,
+  potabilitySourceCategory,
+  type StatusPresentation,
 } from '../presentation';
 
 /**
@@ -18,16 +20,28 @@ import {
 export function WaterPointStatusList({
   point,
 }: {
-  point: Pick<WaterPointSummary, 'potability' | 'operationalStatus' | 'availability'>;
+  point: Pick<WaterPointSummary, 'potability' | 'operationalStatus' | 'availability'> & {
+    primarySourceCategory?: WaterPointSummary['primarySourceCategory'];
+    potabilityEvidence?: Pick<PotabilityEvidence, 'kind'> | null;
+  };
 }) {
   const { t } = useTranslation();
   const theme = useAppTheme();
+  // « Eau potable » s'accompagne toujours de sa provenance (jamais présentée comme certifiée).
+  const potabilitySource =
+    point.potability === 'declared_potable' ? potabilitySourceCategory(point) : null;
 
-  const rows = [
+  const rows: (StatusPresentation & {
+    key: string;
+    label: string;
+    value: string;
+    detail?: string;
+  })[] = [
     {
       key: 'potability',
       label: t('point.potabilityLabel'),
       value: t(`point.potability.${point.potability}`),
+      detail: potabilitySource ? t(`point.potabilitySource.${potabilitySource}`) : undefined,
       ...POTABILITY_PRESENTATION[point.potability],
     },
     {
@@ -51,18 +65,23 @@ export function WaterPointStatusList({
           key={row.key}
           style={[styles.row, { gap: theme.space.md }]}
           accessible
-          accessibilityLabel={`${row.label} : ${row.value}`}
+          accessibilityLabel={`${row.label} : ${row.value}${row.detail ? `, ${row.detail}` : ''}`}
         >
           <AppText variant="footnote" tone="secondary" style={styles.label}>
             {row.label}
           </AppText>
-          <View style={styles.value}>
+          <View style={[styles.value, { gap: theme.space.xxs }]}>
             <StatusBadge
               tone={row.tone}
               icon={row.icon}
               label={row.value}
               testID={`status-${row.key}`}
             />
+            {row.detail ? (
+              <AppText variant="footnote" tone="secondary" testID={`status-${row.key}-source`}>
+                {row.detail}
+              </AppText>
+            ) : null}
           </View>
         </View>
       ))}

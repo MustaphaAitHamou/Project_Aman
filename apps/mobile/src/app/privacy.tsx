@@ -9,10 +9,11 @@ import { useAdsStore } from '@/services/ads/ads-store';
 import { showPrivacyOptions } from '@/services/ads/consent';
 import { useAppTheme } from '@/theme';
 
-type PrivacySection = 'location' | 'account' | 'ads' | 'storage';
+type PrivacySection = 'location' | 'addresses' | 'account' | 'ads' | 'storage';
 
 const SECTIONS: { key: PrivacySection; icon: IconName }[] = [
   { key: 'location', icon: 'crosshairs-gps' },
+  { key: 'addresses', icon: 'map-marker-radius-outline' },
   { key: 'account', icon: 'account-circle-outline' },
   { key: 'ads', icon: 'shield-check-outline' },
   { key: 'storage', icon: 'cellphone-marker' },

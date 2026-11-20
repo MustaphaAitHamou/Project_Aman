@@ -51,6 +51,8 @@ export interface ThemeColors {
   error: StatusColors;
   neutral: StatusColors;
   info: StatusColors;
+  /** Bleu source : eau indiquée potable (rassurant, distinct du vert « certifiée »). */
+  water: StatusColors;
   overlay: string;
   focusRing: string;
   tabBar: string;
@@ -105,6 +107,7 @@ export const lightColors: ThemeColors = {
     onSoft: palette.sand.inkSecondary,
   },
   info: { base: '#1F58B0', soft: '#E6EEFB', onSoft: '#1F58B0' },
+  water: { base: palette.source.main, soft: palette.source.soft, onSoft: palette.source.text },
   overlay: 'rgba(29, 27, 25, 0.45)',
   focusRing: palette.sand.ink,
   tabBar: palette.sand.raised,
@@ -141,6 +144,11 @@ export const darkColors: ThemeColors = {
     onSoft: palette.sand.darkInkSecondary,
   },
   info: { base: '#8FB6F5', soft: '#122444', onSoft: '#8FB6F5' },
+  water: {
+    base: palette.source.darkMain,
+    soft: palette.source.darkSoft,
+    onSoft: palette.source.darkText,
+  },
   overlay: 'rgba(0, 0, 0, 0.6)',
   focusRing: palette.sand.darkInk,
   tabBar: palette.sand.darkRaised,

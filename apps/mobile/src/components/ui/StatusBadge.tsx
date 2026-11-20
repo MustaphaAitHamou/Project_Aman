@@ -5,7 +5,7 @@ import { fontFamily, MAX_FONT_SCALE_COMPACT, useAppTheme } from '@/theme';
 import { AppText } from './AppText';
 import { Icon, type IconName } from './Icon';
 
-export type StatusTone = 'success' | 'warning' | 'error' | 'neutral' | 'info';
+export type StatusTone = 'success' | 'warning' | 'error' | 'neutral' | 'info' | 'water';
 
 export interface StatusBadgeProps {
   tone: StatusTone;

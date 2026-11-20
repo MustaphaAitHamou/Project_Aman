@@ -23,6 +23,7 @@ const DEFAULT_ICONS: Record<StatusTone, IconName> = {
   error: 'alert-circle-outline',
   neutral: 'information-outline',
   info: 'information-outline',
+  water: 'water-outline',
 };
 
 export function Banner({

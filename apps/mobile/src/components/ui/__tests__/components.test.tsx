@@ -79,11 +79,30 @@ describe('WaterPointStatusList', () => {
           potability: 'declared_potable',
           operationalStatus: 'out_of_order',
           availability: 'seasonal_closure',
+          primarySourceCategory: 'openstreetmap',
         }}
       />,
     );
-    expect(screen.getByLabelText('Potabilité : Indiquée potable, non certifiée')).toBeOnTheScreen();
+    // « Eau potable » n'est jamais présentée seule : sa provenance l'accompagne.
+    expect(
+      screen.getByLabelText('Potabilité : Eau potable, selon OpenStreetMap'),
+    ).toBeOnTheScreen();
     expect(screen.getByLabelText('Fonctionnement : Hors service (signalé)')).toBeOnTheScreen();
     expect(screen.getByLabelText('Accès : Fermé pour la saison')).toBeOnTheScreen();
+  });
+
+  it('réserve « certifiée » aux preuves officielles et n’ajoute pas de provenance', async () => {
+    await render(
+      <WaterPointStatusList
+        point={{
+          potability: 'certified_potable',
+          operationalStatus: 'working',
+          availability: 'available',
+          primarySourceCategory: 'official',
+        }}
+      />,
+    );
+    expect(screen.getByLabelText('Potabilité : Potable · certifiée')).toBeOnTheScreen();
+    expect(screen.queryByTestId('status-potability-source')).toBeNull();
   });
 });

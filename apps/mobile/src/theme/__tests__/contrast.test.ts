@@ -20,7 +20,7 @@ function textPairs(colors: ThemeColors): [string, string, string][] {
     ['onDanger / danger', colors.onDanger, colors.danger],
     ['tabActive / tabBar', colors.tabActive, colors.tabBar],
     ['tabInactive / tabBar', colors.tabInactive, colors.tabBar],
-    ...(['success', 'warning', 'error', 'neutral', 'info'] as const).map(
+    ...(['success', 'warning', 'error', 'neutral', 'info', 'water'] as const).map(
       (tone): [string, string, string] => [
         `${tone}.onSoft / ${tone}.soft`,
         colors[tone].onSoft,

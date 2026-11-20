@@ -14,6 +14,7 @@ export const LAYER_IDS = {
   clusterCount: 'wf-cluster-count',
   points: 'wf-points',
   selected: 'wf-selected',
+  selectedPulse: 'wf-selected-pulse',
   userAccuracy: 'wf-user-accuracy',
   userDot: 'wf-user-dot',
 } as const;

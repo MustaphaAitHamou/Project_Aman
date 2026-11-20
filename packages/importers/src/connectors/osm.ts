@@ -142,6 +142,21 @@ function potabilityFromTags(tags: Record<string, string>): PotabilityStatus {
   return 'unknown';
 }
 
+/**
+ * Adresse portée par l'objet lui-même (`addr:*`), rarement renseignée sur les fontaines : elle
+ * n'est jamais déduite d'autres objets. Sans elle, l'application cherche l'adresse la plus proche.
+ */
+function addressFromTags(tags: Record<string, string>): {
+  address: string | null;
+  city: string | null;
+} {
+  const line = [tags['addr:housenumber'], tags['addr:street'] ?? tags['addr:place']]
+    .filter(Boolean)
+    .join(' ');
+  const city = [tags['addr:postcode'], tags['addr:city']].filter(Boolean).join(' ');
+  return { address: cleanText(line, 240), city: cleanText(city, 120) };
+}
+
 const triState = (value: string | undefined): boolean | null =>
   value === 'yes' ? true : value === 'no' ? false : null;
 
@@ -165,6 +180,7 @@ export function transformOsmElement(element: OsmElement): ImportRecord | Rejecti
     latitude: coords.latitude,
     longitude: coords.longitude,
     name: cleanText(tags.name, 120),
+    ...addressFromTags(tags),
     potability,
     potability_evidence:
       potability === 'unknown' ? null : { kind: 'osm_tag', source_name: 'OpenStreetMap' },

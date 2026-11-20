@@ -16,6 +16,7 @@ import {
   metersToPixelsExpression,
   pointLayer,
   selectedLayer,
+  selectedPulseLayer,
   userAccuracyLayer,
   userDotLayer,
 } from '../map-layers';
@@ -45,6 +46,7 @@ function buildStyle(selectedId: string | null): StyleSpecification {
       { ...clusterLayer(colors), source: SOURCE_ID },
       { ...clusterCountLayer(colors, 'Noto Sans Bold'), source: SOURCE_ID },
       { ...pointLayer(colors), source: SOURCE_ID },
+      { ...selectedPulseLayer(colors, selectedId), source: SOURCE_ID },
       { ...selectedLayer(colors, selectedId), source: SOURCE_ID },
     ],
   };

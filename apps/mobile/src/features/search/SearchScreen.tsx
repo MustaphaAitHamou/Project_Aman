@@ -2,8 +2,8 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FlatList, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { BrandHero } from '@/components/brand';
 import { AppText, Banner, EmptyState, ListItem } from '@/components/ui';
 import { AdBanner } from '@/features/ads/AdBanner';
 import { NativeAdCard } from '@/features/ads/NativeAdCard';
@@ -25,7 +25,6 @@ import { allCities, CITY_ZOOM, searchCities, type City } from './cities';
 export function SearchScreen() {
   const { t } = useTranslation();
   const theme = useAppTheme();
-  const insets = useSafeAreaInsets();
   const router = useRouter();
   const requestCamera = useMapCameraStore((state) => state.requestCamera);
   const [query, setQuery] = useState('');
@@ -54,17 +53,7 @@ export function SearchScreen() {
       style={[styles.flex, { backgroundColor: theme.colors.background }]}
       testID="search-screen"
     >
-      <View
-        style={{
-          paddingTop: insets.top + theme.space.lg,
-          paddingHorizontal: theme.space.lg,
-          paddingBottom: theme.space.md,
-          gap: theme.space.md,
-        }}
-      >
-        <AppText variant="title1" accessibilityRole="header">
-          {t('search.title')}
-        </AppText>
+      <BrandHero title={t('search.title')}>
         <SearchField
           testID="search-input"
           value={query}
@@ -73,7 +62,7 @@ export function SearchScreen() {
           accessibilityLabel={t('search.inputLabel')}
           clearLabel={t('common.reset')}
         />
-      </View>
+      </BrandHero>
       <FlatList
         data={results}
         keyExtractor={(city) => city.id}

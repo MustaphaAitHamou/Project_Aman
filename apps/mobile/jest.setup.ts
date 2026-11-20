@@ -75,3 +75,9 @@ jest.mock('react-native-google-mobile-ads', () => ({
   NativeMediaView: () => null,
   NativeAssetType: {},
 }));
+
+// Aucun appel réseau réel en test : les services reçoivent un `fetchImpl` simulé ; tout autre
+// appel (ex. géocodage inverse déclenché par un écran) échoue proprement au lieu de sortir.
+globalThis.fetch = jest.fn(() =>
+  Promise.reject(new Error('Réseau désactivé dans les tests')),
+) as unknown as typeof fetch;

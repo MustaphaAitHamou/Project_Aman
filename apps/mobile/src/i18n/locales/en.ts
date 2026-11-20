@@ -99,8 +99,8 @@ export const en: Translations = {
     },
     potabilityLabel: 'Drinkability',
     potability: {
-      certified_potable: 'Drinkable (official source)',
-      declared_potable: 'Reported drinkable, not certified',
+      certified_potable: 'Drinkable · certified',
+      declared_potable: 'Drinking water',
       not_potable: 'Not drinkable',
       unknown: 'Drinkability unknown',
     },
@@ -153,16 +153,29 @@ export const en: Translations = {
     googleMaps: 'Google Maps',
     potabilityDisclaimer:
       'Only a dated official source certifies drinkability. When in doubt, do not drink.',
+    potabilitySource: {
+      official: 'according to an official source',
+      openstreetmap: 'according to OpenStreetMap',
+      community: 'according to the community',
+    },
+    declaredNote:
+      'Reported drinkable by its source; no dated sanitary check is published for this point. A sign on site takes precedence.',
+    address: {
+      label: 'Address',
+      approximate: 'Approximate address (nearest)',
+      loading: 'Looking up the address…',
+      unavailable: 'Address unavailable for now',
+    },
     closePreview: 'Close preview',
   },
   filters: {
     title: 'Filters',
     potabilityTitle: 'Drinkability',
     potabilityAny: 'All',
-    potabilityPotable: 'Reported drinkable',
+    potabilityPotable: 'Drinkable',
     potabilityCertified: 'Certified',
     potabilityHint:
-      '“Certified”: only points whose drinkability comes from a dated official source.',
+      '“Drinkable”: water reported drinkable by a source (OpenStreetMap, local authority, community). “Certified”: only points whose drinkability comes from a dated official source.',
     otherTitle: 'Other criteria',
     hideOutOfOrder: 'Hide out-of-order points',
     sparklingOnly: 'Sparkling water only',
@@ -186,6 +199,9 @@ export const en: Translations = {
   legend: {
     title: 'Map legend',
     markersTitle: 'Point color: drinkability',
+    certifiedBody: 'Drinkability attested by a dated official source (e.g. sanitary check).',
+    declaredBody:
+      'Reported drinkable by its source (OpenStreetMap, local authority or community), without official certification.',
     outOfOrderTitle: 'Out-of-order point',
     outOfOrderBody: 'Hollow circle: a malfunction has been reported.',
     clusterTitle: 'Group of points',
@@ -300,6 +316,9 @@ export const en: Translations = {
     locationTitle: 'Location',
     locationBody:
       'Your location is used only while the app is open, to display the map and compute distances. It is never stored or sent to our servers, and no movement history is kept.',
+    addressesTitle: 'Search and addresses',
+    addressesBody:
+      'Address search only sends the text you type. To show the address of a water point that has none, the app sends that point’s coordinates (never your location) to the IGN Géoplateforme in France, or to Photon (OpenStreetMap) elsewhere.',
     accountTitle: 'Account',
     accountBody:
       'Browsing the map requires no account. An account (email address and optional nickname) is only needed to contribute; you can delete it at any time from your profile.',
@@ -436,7 +455,7 @@ export const en: Translations = {
     potabilityPotable: 'Yes, drinking water',
     potabilityNotPotable: 'Not drinkable',
     potabilityNotice:
-      'Your answer will be shown as “indicated drinkable, not certified”. Only a dated official source certifies drinkability.',
+      'Your answer will be shown as “Drinking water, according to the community”. Only a dated official source certifies drinkability.',
     dontKnow: 'I don’t know',
     yes: 'Yes',
     no: 'No',
@@ -496,6 +515,7 @@ export const en: Translations = {
     evidenceDate: 'Information dated {{date}}',
     evidenceUndated: 'Undated information',
     noEvidence: 'No source states whether this point is drinkable.',
+    evidenceFromSource: 'Information from: {{source}}',
     infoSection: 'Information',
     openingHours: 'Opening hours: {{hours}}',
     photosSection: 'Photos',

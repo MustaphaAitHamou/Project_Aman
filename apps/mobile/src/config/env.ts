@@ -24,6 +24,12 @@ export const DEFAULT_GEOCODING_URL = 'https://data.geopf.fr/geocodage/search';
  * Pour la production : instance dédiée ou offre commerciale (voir DATA_SOURCES.md).
  */
 export const DEFAULT_GEOCODING_INTL_URL = 'https://photon.komoot.io/api';
+/**
+ * Adresse la plus proche d'un point d'eau (géocodage inverse), mêmes services : Géoplateforme en
+ * France, Photon ailleurs. Seules les coordonnées du point d'eau sont envoyées.
+ */
+export const DEFAULT_REVERSE_GEOCODING_URL = 'https://data.geopf.fr/geocodage/reverse';
+export const DEFAULT_REVERSE_GEOCODING_INTL_URL = 'https://photon.komoot.io/reverse';
 
 function readAppEnv(): AppEnv {
   const value: unknown = Constants.expoConfig?.extra?.appEnv;
@@ -47,6 +53,11 @@ export const env = {
   geocodingUrl: process.env.EXPO_PUBLIC_GEOCODING_URL || DEFAULT_GEOCODING_URL,
   /** Géocodage international (Photon, données OpenStreetMap). */
   geocodingIntlUrl: process.env.EXPO_PUBLIC_GEOCODING_INTL_URL || DEFAULT_GEOCODING_INTL_URL,
+  /** Adresse des points d'eau sans adresse fournie par leur source (géocodage inverse). */
+  reverseGeocodingUrl:
+    process.env.EXPO_PUBLIC_REVERSE_GEOCODING_URL || DEFAULT_REVERSE_GEOCODING_URL,
+  reverseGeocodingIntlUrl:
+    process.env.EXPO_PUBLIC_REVERSE_GEOCODING_INTL_URL || DEFAULT_REVERSE_GEOCODING_INTL_URL,
   /** Publicités : désactivables globalement (ex. tests, captures pour les stores). */
   adsEnabled: process.env.EXPO_PUBLIC_ADS_ENABLED !== 'false',
 } as const;

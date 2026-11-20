@@ -78,6 +78,13 @@ export default function MapLegendScreen() {
             key={status}
             swatch={<Swatch fill={map[POTABILITY_COLOR[status]]} stroke={map.pointStroke} />}
             title={t(`point.potability.${status}`)}
+            body={
+              status === 'certified_potable'
+                ? t('legend.certifiedBody')
+                : status === 'declared_potable'
+                  ? t('legend.declaredBody')
+                  : undefined
+            }
           />
         ))}
       </Section>

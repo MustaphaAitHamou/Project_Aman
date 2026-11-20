@@ -158,6 +158,22 @@ est envoyé (jamais la position), après 3 caractères et 350 ms d'inactivité. 
 sous les résultats. Format et conditions d'usage à confirmer lors de la recette (hôte bloqué ici).
 La liste embarquée de grandes villes reste disponible hors ligne.
 
+### Adresse des points d'eau (géocodage inverse, 20/11/2026)
+
+Chaque point affiche une adresse :
+
+1. celle de sa **source** quand elle existe (jeux de données officiels ; balises `addr:*` d'un
+   objet OpenStreetMap, désormais lues par l'import, rarement renseignées sur les fontaines) ;
+2. sinon, l'**adresse la plus proche**, marquée « Adresse approximative » : Géoplateforme
+   (`/geocodage/reverse?lon=…&lat=…&index=address&limit=1`) en France métropolitaine, Photon
+   (`/reverse`) ailleurs. Une adresse à plus de 250 m n'est pas affichée.
+
+Seules les coordonnées du point d'eau consulté sont envoyées (jamais la position de
+l'utilisateur), à l'ouverture de son aperçu ou de sa fiche ; le résultat est gardé en mémoire
+pendant la session. URL configurables (`EXPO_PUBLIC_REVERSE_GEOCODING_URL`,
+`EXPO_PUBLIC_REVERSE_GEOCODING_INTL_URL`). Format des réponses à confirmer en recette (hôtes
+bloqués ici : testé sur des réponses simulées au format documenté).
+
 ## Contributions (phase 5)
 
 Ajouts, signalements de panne / remise en service, photos, corrections : modérés, historisés,

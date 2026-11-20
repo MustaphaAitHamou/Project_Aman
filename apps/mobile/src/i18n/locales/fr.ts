@@ -102,8 +102,8 @@ export const fr = {
     },
     potabilityLabel: 'Potabilité',
     potability: {
-      certified_potable: 'Potable (source officielle)',
-      declared_potable: 'Indiquée potable, non certifiée',
+      certified_potable: 'Potable · certifiée',
+      declared_potable: 'Eau potable',
       not_potable: 'Non potable',
       unknown: 'Potabilité inconnue',
     },
@@ -156,16 +156,29 @@ export const fr = {
     googleMaps: 'Google Maps',
     potabilityDisclaimer:
       'Seule une source officielle datée certifie la potabilité. En cas de doute, ne buvez pas.',
+    potabilitySource: {
+      official: 'selon une source officielle',
+      openstreetmap: 'selon OpenStreetMap',
+      community: 'selon la communauté',
+    },
+    declaredNote:
+      'Indiquée potable par sa source ; aucun contrôle sanitaire daté n’est publié pour ce point. Un panneau sur place fait foi.',
+    address: {
+      label: 'Adresse',
+      approximate: 'Adresse approximative (la plus proche)',
+      loading: 'Recherche de l’adresse…',
+      unavailable: 'Adresse indisponible pour le moment',
+    },
     closePreview: 'Fermer l’aperçu',
   },
   filters: {
     title: 'Filtres',
     potabilityTitle: 'Potabilité',
     potabilityAny: 'Tous',
-    potabilityPotable: 'Indiquée potable',
+    potabilityPotable: 'Potable',
     potabilityCertified: 'Certifiée',
     potabilityHint:
-      '« Certifiée » : uniquement les points dont la potabilité provient d’une source officielle datée.',
+      '« Potable » : eau indiquée potable par une source (OpenStreetMap, collectivité, communauté). « Certifiée » : uniquement les points dont la potabilité provient d’une source officielle datée.',
     otherTitle: 'Autres critères',
     hideOutOfOrder: 'Masquer les points hors service',
     sparklingOnly: 'Eau gazeuse uniquement',
@@ -189,6 +202,9 @@ export const fr = {
   legend: {
     title: 'Légende de la carte',
     markersTitle: 'Couleur des points : potabilité',
+    certifiedBody: 'Potabilité attestée par une source officielle datée (ex. contrôle sanitaire).',
+    declaredBody:
+      'Indiquée potable par sa source (OpenStreetMap, collectivité ou communauté), sans certification officielle.',
     outOfOrderTitle: 'Point hors service',
     outOfOrderBody: 'Cercle évidé : un dysfonctionnement a été signalé.',
     clusterTitle: 'Groupe de points',
@@ -305,6 +321,9 @@ export const fr = {
     locationTitle: 'Localisation',
     locationBody:
       'Votre position est utilisée uniquement lorsque l’application est ouverte, pour afficher la carte et calculer les distances. Elle n’est ni enregistrée, ni envoyée à nos serveurs, et aucun historique de déplacement n’est conservé.',
+    addressesTitle: 'Recherche et adresses',
+    addressesBody:
+      'La recherche d’adresse n’envoie que le texte saisi. Pour afficher l’adresse d’un point d’eau qui n’en a pas, l’application envoie les coordonnées de ce point (jamais votre position) à la Géoplateforme de l’IGN en France, ou à Photon (OpenStreetMap) ailleurs.',
     accountTitle: 'Compte',
     accountBody:
       'La consultation de la carte ne nécessite aucun compte. Un compte (adresse e-mail et pseudonyme facultatif) est demandé uniquement pour contribuer ; vous pouvez le supprimer à tout moment depuis votre profil.',
@@ -445,7 +464,7 @@ export const fr = {
     potabilityPotable: 'Oui, eau potable',
     potabilityNotPotable: 'Eau non potable',
     potabilityNotice:
-      'Votre réponse sera affichée comme « indiquée potable, non certifiée ». Seule une source officielle datée certifie la potabilité.',
+      'Votre réponse sera affichée comme « Eau potable, selon la communauté ». Seule une source officielle datée certifie la potabilité.',
     dontKnow: 'Je ne sais pas',
     yes: 'Oui',
     no: 'Non',
@@ -505,6 +524,7 @@ export const fr = {
     evidenceDate: 'Information datée du {{date}}',
     evidenceUndated: 'Information non datée',
     noEvidence: 'Aucune source n’indique la potabilité de ce point.',
+    evidenceFromSource: 'Information issue de : {{source}}',
     infoSection: 'Informations',
     openingHours: 'Horaires : {{hours}}',
     photosSection: 'Photos',

@@ -90,13 +90,40 @@ export function selectedFilter(selectedId: string | null): FilterSpecification {
   return ['all', IS_POINT, ['==', ['get', 'id'], selectedId ?? '']];
 }
 
+/** Rayon du halo de sélection selon le zoom, agrandi de `extra` pixels (onde animée). */
+export function selectedRadius(extra = 0): ExpressionSpecification {
+  return ['interpolate', ['linear'], ['zoom'], 10, 11 + extra, 14, 15 + extra, 17, 19 + extra];
+}
+
+/** Agrandissement maximal de l'onde qui part du point sélectionné (pixels). */
+export const SELECTED_PULSE_EXTRA = 14;
+
+/**
+ * Onde autour du point sélectionné : l'application fait varier son rayon et son opacité (avec
+ * des transitions MapLibre) pour donner vie au point choisi.
+ */
+export function selectedPulseLayer(colors: MapColors, selectedId: string | null): CircleLayer {
+  return {
+    id: LAYER_IDS.selectedPulse,
+    type: 'circle',
+    filter: selectedFilter(selectedId),
+    paint: {
+      'circle-radius': selectedRadius(),
+      'circle-color': 'rgba(0, 0, 0, 0)',
+      'circle-stroke-color': colors.selectedHalo,
+      'circle-stroke-width': 3,
+      'circle-stroke-opacity': 0,
+    },
+  };
+}
+
 export function selectedLayer(colors: MapColors, selectedId: string | null): CircleLayer {
   return {
     id: LAYER_IDS.selected,
     type: 'circle',
     filter: selectedFilter(selectedId),
     paint: {
-      'circle-radius': ['interpolate', ['linear'], ['zoom'], 10, 11, 14, 15, 17, 19],
+      'circle-radius': selectedRadius(),
       'circle-color': 'rgba(0, 0, 0, 0)',
       'circle-stroke-color': colors.selectedHalo,
       'circle-stroke-width': 4,

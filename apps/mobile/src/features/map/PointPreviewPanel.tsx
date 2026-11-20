@@ -8,11 +8,15 @@ import { useTranslation } from 'react-i18next';
 import { ScrollView, StyleSheet, View, type LayoutChangeEvent } from 'react-native';
 import Animated, { ReduceMotion, SlideInDown, SlideOutDown } from 'react-native-reanimated';
 
+import { Drop } from '@/components/brand';
 import { AppText, Button, Icon, IconButton } from '@/components/ui';
+import { PointAddress } from '@/features/water-points/components/PointAddress';
 import { FreshnessAndSource, PointFacts } from '@/features/water-points/components/PointFacts';
 import { WaterPointStatusList } from '@/features/water-points/components/WaterPointStatusList';
 import { KIND_ICONS } from '@/features/water-points/presentation';
+import { usePointAddress } from '@/services/geocoding/usePointAddress';
 import type { UserPosition } from '@/services/location/types';
+import { useWaterPoint } from '@/services/water-points/useWaterPoint';
 import { useAppTheme } from '@/theme';
 
 export interface PointPreviewPanelProps {
@@ -37,6 +41,12 @@ export function PointPreviewPanel({
 }: PointPreviewPanelProps) {
   const { t, i18n } = useTranslation();
   const theme = useAppTheme();
+  // La fiche est chargée dès l'aperçu : elle fournit l'adresse de la source et s'ouvrira aussitôt.
+  const detail = useWaterPoint(point.id);
+  const address = usePointAddress(
+    { location: point.location, address: detail.data?.address, city: detail.data?.city },
+    { waitForStored: detail.isPending },
+  );
   const kindLabel = t(`point.kind.${point.kind}`);
   const distance = userPosition
     ? formatDistance(haversineDistanceMeters(userPosition, point.location), {
@@ -50,7 +60,8 @@ export function PointPreviewPanel({
   ]
     .filter(Boolean)
     .join(' · ');
-  const showDisclaimer = point.potability === 'declared_potable' || point.potability === 'unknown';
+  // « Eau potable » porte déjà sa provenance ; l'avertissement reste pour l'absence d'information.
+  const showDisclaimer = point.potability === 'unknown';
 
   return (
     <Animated.View
@@ -73,9 +84,9 @@ export function PointPreviewPanel({
         contentContainerStyle={{ padding: theme.space.lg, gap: theme.space.md }}
       >
         <View style={[styles.header, { gap: theme.space.md }]}>
-          <View style={[styles.kindIcon, { backgroundColor: theme.colors.primarySoft }]}>
-            <Icon name={KIND_ICONS[point.kind]} size={26} color={theme.colors.onPrimarySoft} />
-          </View>
+          <Drop size={46} color={theme.colors.primarySoft} highlight={false}>
+            <Icon name={KIND_ICONS[point.kind]} size={24} color={theme.colors.onPrimarySoft} />
+          </Drop>
           <View style={styles.headerText}>
             <AppText variant="title3" numberOfLines={2} accessibilityRole="header">
               {point.name ?? kindLabel}
@@ -97,6 +108,7 @@ export function PointPreviewPanel({
           />
         </View>
 
+        <PointAddress state={address} testID="point-preview-address" />
         <WaterPointStatusList point={point} />
         {showDisclaimer ? (
           <AppText variant="footnote" tone="muted">
@@ -139,13 +151,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  kindIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   headerText: {
     flex: 1,

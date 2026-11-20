@@ -1,4 +1,4 @@
-import type { LngLat } from '@water-finder/core';
+import { haversineDistanceMeters, type LngLat } from '@water-finder/core';
 
 import { env } from '@/config/env';
 
@@ -157,4 +157,95 @@ export async function searchAddresses(
   if (!response.ok) throw new Error(`geocoding_http_${response.status}`);
   const json: unknown = await response.json();
   return photon ? parsePhotonResponse(json) : parseGeocodingResponse(json);
+}
+
+/** Adresse la plus proche d'un point (géocodage inverse). */
+export interface ReverseGeocodingResult {
+  label: string;
+  /** Distance en mètres entre le point et l'adresse trouvée, si le service la fournit. */
+  distanceM: number | null;
+}
+
+/** Au-delà, l'adresse trouvée est trop éloignée pour situer le point : elle n'est pas affichée. */
+export const MAX_REVERSE_DISTANCE_M = 250;
+
+/** Réponse de la Géoplateforme (`/geocodage/reverse`) : `properties.label`, `properties.distance`. */
+export function parseIgnReverseResponse(json: unknown): ReverseGeocodingResult | null {
+  const features = (json as { features?: unknown })?.features;
+  if (!Array.isArray(features)) return null;
+  for (const feature of features as Record<string, unknown>[]) {
+    const props = (feature?.properties ?? {}) as Record<string, unknown>;
+    const label = typeof props.label === 'string' ? props.label.trim() : '';
+    if (!label) continue;
+    const distance = typeof props.distance === 'number' ? props.distance : Number.NaN;
+    return { label, distanceM: Number.isFinite(distance) ? distance : null };
+  }
+  return null;
+}
+
+/** Réponse de Photon (`/reverse`) : libellé reconstitué, distance calculée depuis le point. */
+export function parsePhotonReverseResponse(
+  json: unknown,
+  origin: LngLat,
+): ReverseGeocodingResult | null {
+  const features = (json as { features?: unknown })?.features;
+  if (!Array.isArray(features)) return null;
+  for (const feature of features as Record<string, unknown>[]) {
+    const p = (feature?.properties ?? {}) as Record<string, unknown>;
+    const text = (key: string) =>
+      typeof p[key] === 'string' && (p[key] as string).trim() ? (p[key] as string).trim() : null;
+    const street = [text('housenumber'), text('street')].filter(Boolean).join(' ');
+    const place = [text('postcode'), text('city') ?? text('town') ?? text('village')]
+      .filter(Boolean)
+      .join(' ');
+    const first = street || text('name');
+    const label = [first, place].filter(Boolean).join(', ');
+    if (!label) continue;
+    const coords = (feature.geometry as { coordinates?: unknown } | undefined)?.coordinates;
+    let distanceM: number | null = null;
+    if (Array.isArray(coords)) {
+      const [lng, lat] = coords.map(Number);
+      if (Number.isFinite(lng) && Number.isFinite(lat)) {
+        distanceM = haversineDistanceMeters(
+          { latitude: origin[1], longitude: origin[0] },
+          { latitude: lat as number, longitude: lng as number },
+        );
+      }
+    }
+    return { label, distanceM };
+  }
+  return null;
+}
+
+/**
+ * Adresse la plus proche des coordonnées d'un point d'eau. Seules ces coordonnées (publiques)
+ * sont envoyées, jamais la position de l'utilisateur. `null` si rien d'assez proche.
+ */
+export async function reverseGeocode(
+  center: LngLat,
+  options: {
+    provider: GeocodingProvider;
+    signal?: AbortSignal;
+    fetchImpl?: typeof fetch;
+    language?: string;
+  },
+): Promise<ReverseGeocodingResult | null> {
+  const [lng, lat] = center;
+  if (!Number.isFinite(lng) || !Number.isFinite(lat)) return null;
+  const photon = options.provider === 'photon';
+  const coords = { lon: lng.toFixed(5), lat: lat.toFixed(5), limit: '1' };
+  const params = photon
+    ? new URLSearchParams({ ...coords, lang: options.language === 'fr' ? 'fr' : 'en' })
+    : new URLSearchParams({ ...coords, index: 'address' });
+  const base = photon ? env.reverseGeocodingIntlUrl : env.reverseGeocodingUrl;
+  const response = await (options.fetchImpl ?? fetch)(`${base}?${params}`, {
+    signal: options.signal,
+    headers: { Accept: 'application/json' },
+  });
+  if (!response.ok) throw new Error(`reverse_geocoding_http_${response.status}`);
+  const json: unknown = await response.json();
+  const result = photon ? parsePhotonReverseResponse(json, center) : parseIgnReverseResponse(json);
+  if (!result) return null;
+  if (result.distanceM !== null && result.distanceM > MAX_REVERSE_DISTANCE_M) return null;
+  return result;
 }

@@ -48,6 +48,23 @@ describe('OpenStreetMap', () => {
     });
   });
 
+  it('reprend l’adresse portée par l’objet (addr:*), sans jamais l’inventer', () => {
+    const withAddress = payloadOf(
+      transformOsmElement(
+        osm({
+          amenity: 'drinking_water',
+          'addr:housenumber': '12',
+          'addr:street': 'Rue de Rivoli',
+          'addr:postcode': '75004',
+          'addr:city': 'Paris',
+        }),
+      ),
+    );
+    expect(withAddress).toMatchObject({ address: '12 Rue de Rivoli', city: '75004 Paris' });
+    const without = payloadOf(transformOsmElement(osm({ amenity: 'drinking_water' })));
+    expect(without).toMatchObject({ address: null, city: null });
+  });
+
   it('une fontaine sans drinking_water=yes est décorative et de potabilité inconnue', () => {
     expect(payloadOf(transformOsmElement(osm({ amenity: 'fountain' })))).toMatchObject({
       kind: 'decorative_fountain',

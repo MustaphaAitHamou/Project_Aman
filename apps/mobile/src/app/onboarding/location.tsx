@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Linking, Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { MascotStage } from '@/components/brand';
 import { AppText, Banner, Button, Icon } from '@/components/ui';
 import { useLocationStore } from '@/stores/location';
 import { usePreferencesStore } from '@/stores/preferences';
@@ -51,9 +52,7 @@ export default function LocationPermissionScreen() {
       ]}
     >
       <View style={[styles.content, { gap: theme.space.xl }]}>
-        <View style={[styles.iconCircle, { backgroundColor: theme.colors.primarySoft }]}>
-          <Icon name="crosshairs-gps" size={56} color={theme.colors.primary} />
-        </View>
+        <MascotStage icon="crosshairs-gps" size={180} />
         <View style={{ gap: theme.space.md }}>
           <AppText variant="title1" align="center" accessibilityRole="header">
             {t('onboarding.locationTitle')}
@@ -115,13 +114,6 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
     alignItems: 'center',
     justifyContent: 'center',
   },
